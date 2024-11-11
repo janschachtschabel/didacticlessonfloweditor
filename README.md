@@ -1,129 +1,130 @@
-# Didactic Template Processor
+# Didaktischer Template-Prozessor
 
-A web-based tool for creating and managing didactic templates with a visual flow editor. Design your learning sequences, manage actors and environments, and visualize the learning process.
+Ein webbasiertes Tool zum Erstellen und Verwalten von didaktischen Templates mit einem visuellen Flow-Editor. Entwerfen Sie Lernsequenzen, verwalten Sie Akteure und Lernumgebungen und visualisieren Sie den Lernprozess.
 
-## Prerequisites
+## Voraussetzungen
 
-- Node.js (version 16 or higher)
-- npm (comes with Node.js)
+- Node.js (Download unter: https://nodejs.org/)
+- npm (wird mit Node.js mitgeliefert)
 
 ## Installation
 
-1. Clone the repository
-2. Install dependencies:
+1. Repository klonen
+2. Abhängigkeiten installieren:
 ```bash
 npm install
 ```
 
-## Getting Started
+## Erste Schritte
 
-Run the development server:
+Entwicklungsserver starten:
 
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+Die Anwendung ist dann unter `http://localhost:5173` verfügbar.
 
-## Features
+## Funktionen
 
-### 1. Template Management
-- Create and edit didactic templates
-- Save and load templates as JSON files
-- Example templates included
+### 1. Template-Verwaltung
+- Erstellen und Bearbeiten von didaktischen Templates
+- Speichern und Laden von Templates als JSON-Dateien
+- Beispiel-Templates enthalten
+- PDF-Export mit detaillierter Aufbereitung
 
-### 2. Visual Components
+### 2. Visuelle Komponenten
 
-#### General Settings
-- Set template metadata
-- Define title, description, and keywords
-- Manage version information
+#### Allgemeine Einstellungen
+- Template-Metadaten festlegen
+- Titel, Beschreibung und Schlüsselwörter definieren
+- Versionsinformationen verwalten
 
-#### Pattern Elements
-- Define problems and learning goals
-- Set influence factors
-- Configure context and solutions
+#### Patternelemente
+- Probleme und Lernziele definieren
+- Einflussfaktoren festlegen
+- Kontext und Lösungen konfigurieren
 
-#### Actors
-- Create and manage actors (teachers, students, groups)
-- Define actor properties:
-  - Demographics
-  - Education level
-  - Competencies
-  - Learning requirements
+#### Akteure
+- Akteure erstellen und verwalten (Lehrkräfte, Schüler, Gruppen)
+- Akteur-Eigenschaften definieren:
+  - Demografische Daten
+  - Bildungsniveau
+  - Kompetenzen
+  - Lernanforderungen
 
-#### Learning Environments
-- Configure learning spaces
-- Manage resources:
-  - Materials
-  - Tools
-  - Services
+#### Lernumgebungen
+- Lernräume konfigurieren
+- Ressourcen verwalten:
+  - Lernmaterialien
+  - Werkzeuge
+  - Dienste
 
-#### Course Flow
-- Design learning sequences
-- Create phases and activities
-- Define roles and tasks
-- Set up assessment criteria
+#### Unterrichtsablauf
+- Lernsequenzen gestalten
+- Phasen und Aktivitäten erstellen
+- Rollen und Aufgaben definieren
+- Bewertungskriterien festlegen
 
-#### Preview
-- Visual flow graph showing:
-  - Sequence structure
-  - Process flow
-  - Parallel activities
-  - Role relationships
-- Table view for detailed sequence information
-- Raw data view for JSON structure
+#### Vorschau
+- Visueller Flow-Graph mit:
+  - Sequenzstruktur
+  - Prozessablauf
+  - Parallele Aktivitäten
+  - Rollenbeziehungen
+- Tabellenansicht für detaillierte Sequenzinformationen
+- Rohdatenansicht für JSON-Struktur
 
-### 3. Visualization Features
+### 3. Visualisierungsmerkmale
 
-The flow graph uses different colors and styles to represent:
+Der Flow-Graph verwendet verschiedene Farben und Stile:
 
-- **Structural Relationships**
-  - Contains/Implements (dashed lines)
-  - References (dashed lines)
+- **Strukturelle Beziehungen**
+  - Enthält/Implementiert (gestrichelte Linien)
+  - Referenzen (gestrichelte Linien)
 
-- **Process Flow**
-  - Sequential Flow (orange, animated)
-  - Parallel Execution (purple, animated)
+- **Prozessablauf**
+  - Sequenzieller Ablauf (orange, animiert)
+  - Parallele Ausführung (lila, animiert)
 
-- **Node Types**
-  - Solution/Approach (gray)
-  - Learning Sequences (blue)
-  - Phases (green)
-  - Activities (yellow)
-  - Roles (orange)
-  - Actors (pink)
-  - Learning Environments (purple)
-  - Materials (red)
-  - Tools (indigo)
-  - Services (teal)
+- **Knotentypen**
+  - Lösung/Ansatz (grau)
+  - Lernsequenzen (blau)
+  - Phasen (grün)
+  - Aktivitäten (gelb)
+  - Rollen (orange)
+  - Akteure (pink)
+  - Lernumgebungen (lila)
+  - Materialien (rot)
+  - Werkzeuge (indigo)
+  - Dienste (türkis)
 
-## Project Structure
+## Projektstruktur
 
 ```
 src/
-├── components/         # Reusable UI components
-│   ├── course/        # Course flow related components
-│   ├── environments/  # Environment management components
-│   └── preview/       # Visualization components
-├── pages/             # Main page components
-├── store/             # State management
-└── lib/              # Utilities and types
+├── components/         # Wiederverwendbare UI-Komponenten
+│   ├── course/        # Komponenten für den Unterrichtsablauf
+│   ├── environments/  # Komponenten für Umgebungsverwaltung
+│   └── preview/       # Visualisierungskomponenten
+├── pages/             # Hauptseiten-Komponenten
+├── store/             # Zustandsverwaltung
+└── lib/              # Hilfsfunktionen und Typen
 ```
 
-## Data Model
+## Datenmodell
 
-The template structure follows a hierarchical model:
-- Sequences contain phases
-- Phases contain activities
-- Activities contain roles
-- Roles reference actors and environments
-- Environments contain materials, tools, and services
+Die Template-Struktur folgt einem hierarchischen Modell:
+- Sequenzen enthalten Phasen
+- Phasen enthalten Aktivitäten
+- Aktivitäten enthalten Rollen
+- Rollen referenzieren Akteure und Umgebungen
+- Umgebungen enthalten Materialien, Werkzeuge und Dienste
 
-## Contributing
+## Mitwirken
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+1. Repository forken
+2. Feature-Branch erstellen
+3. Änderungen committen
+4. Zum Branch pushen
+5. Pull Request erstellen
