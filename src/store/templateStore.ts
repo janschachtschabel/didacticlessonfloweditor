@@ -1,22 +1,53 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { exampleTemplate } from '../data/exampleTemplate';
 
-// ... rest of the type definitions remain the same ...
+// Actor Types
+export type ActorType = 'Einzelperson' | 'Gruppe' | 'KI';
+export type MotivationType = 'intrinsisch' | 'extrinsisch';
+export type MotivationLevel = 'niedrig' | 'mittel' | 'hoch';
+
+// ... rest of type definitions remain the same ...
 
 const initialState: TemplateState = {
-  metadata: exampleTemplate.metadata,
-  problem: exampleTemplate.problem,
-  context: exampleTemplate.context,
-  influence_factors: exampleTemplate.influence_factors,
-  solution: exampleTemplate.solution,
-  consequences: exampleTemplate.consequences,
-  implementation_notes: exampleTemplate.implementation_notes,
-  related_patterns: exampleTemplate.related_patterns,
-  feedback: exampleTemplate.feedback,
-  sources: exampleTemplate.sources,
-  actors: exampleTemplate.actors,
-  environments: exampleTemplate.environments
+  metadata: {
+    title: '',
+    description: '',
+    keywords: [],
+    author: '',
+    version: '1.0'
+  },
+  problem: {
+    problem_description: '',
+    learning_goals: [],
+    didactic_keywords: []
+  },
+  context: {
+    target_group: '',
+    subject: '',
+    educational_level: '',
+    prerequisites: '',
+    time_frame: ''
+  },
+  influence_factors: [],
+  solution: {
+    solution_description: '',
+    didactic_approach: '',
+    didactic_template: {
+      learning_sequences: []
+    }
+  },
+  consequences: {
+    advantages: [],
+    disadvantages: []
+  },
+  implementation_notes: [],
+  related_patterns: [],
+  feedback: {
+    comments: []
+  },
+  sources: [],
+  actors: [],
+  environments: []
 };
 
 export const useTemplateStore = create<TemplateState & TemplateActions>()(
