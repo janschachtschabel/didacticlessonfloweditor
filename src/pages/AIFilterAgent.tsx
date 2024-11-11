@@ -72,120 +72,114 @@ export function AIFilterAgent() {
     setStatus([]);
 
     try {
-      const sequences = currentTemplate.solution?.didactic_template?.learning_sequences || [];
-      let updatedTemplate = { ...currentTemplate };
+      let updatedEnvironments = [...currentTemplate.environments];
+      let totalProcessed = 0;
 
-      for (const sequence of sequences) {
-        addStatus(`Verarbeite Sequenz: ${sequence.sequence_name || sequence.sequence_id}`);
-        
-        for (const phase of sequence.phases || []) {
-          addStatus(`Verarbeite Phase: ${phase.phase_name || phase.phase_id}`);
+      for (let envIndex = 0; envIndex < updatedEnvironments.length; envIndex++) {
+        const env = updatedEnvironments[envIndex];
+        addStatus(`\n📂 Verarbeite Lernumgebung: ${env.name}`);
+
+        // Process materials
+        for (let i = 0; i < env.materials.length; i++) {
+          const material = env.materials[i];
+          addStatus(`\n🔍 Verarbeite Material: ${material.name}`);
           
-          for (const activity of phase.activities || []) {
-            addStatus(`Verarbeite Aktivität: ${activity.name || activity.activity_id}`);
-            
-            for (const role of activity.roles || []) {
-              addStatus(`Verarbeite Rolle: ${role.role_name}`);
-              
-              const environment = currentTemplate.environments.find(
-                env => env.id === role.learning_environment?.environment_id
-              );
+          const filterContext = {
+            itemName: material.name,
+            itemType: 'material' as const,
+            educationalLevel: currentTemplate.context.educational_level,
+            subject: currentTemplate.context.subject,
+            activityName: '',
+            roleName: '',
+            taskDescription: '',
+            template: currentTemplate
+          };
 
-              if (environment) {
-                // Process materials
-                for (const material of environment.materials) {
-                  if (role.learning_environment?.selected_materials?.includes(material.id)) {
-                    addStatus(`\nVerarbeite Material: ${material.name}`);
-                    
-                    material.source = 'filter';
-                    addStatus('Material-Quelle auf "filter" gesetzt');
+          const criteria = await generateFilterCriteria(
+            filterContext,
+            apiKey,
+            selectedFilters,
+            addStatus
+          );
 
-                    const filterContext = {
-                      itemName: material.name,
-                      itemType: 'material' as const,
-                      educationalLevel: currentTemplate.context.educational_level,
-                      subject: currentTemplate.context.subject,
-                      activityName: activity.name,
-                      roleName: role.role_name,
-                      taskDescription: role.task_description,
-                      template: currentTemplate
-                    };
+          updatedEnvironments[envIndex].materials[i] = {
+            ...material,
+            filter_criteria: criteria,
+            source: 'filter'
+          };
+          totalProcessed++;
+        }
 
-                    material.filter_criteria = await generateFilterCriteria(
-                      filterContext,
-                      apiKey,
-                      selectedFilters,
-                      addStatus
-                    );
-                  }
-                }
+        // Process tools
+        for (let i = 0; i < env.tools.length; i++) {
+          const tool = env.tools[i];
+          addStatus(`\n🔧 Verarbeite Werkzeug: ${tool.name}`);
+          
+          const filterContext = {
+            itemName: tool.name,
+            itemType: 'tool' as const,
+            educationalLevel: currentTemplate.context.educational_level,
+            subject: currentTemplate.context.subject,
+            activityName: '',
+            roleName: '',
+            taskDescription: '',
+            template: currentTemplate
+          };
 
-                // Process tools
-                for (const tool of environment.tools) {
-                  if (role.learning_environment?.selected_tools?.includes(tool.id)) {
-                    addStatus(`\nVerarbeite Werkzeug: ${tool.name}`);
-                    
-                    tool.source = 'filter';
-                    addStatus('Werkzeug-Quelle auf "filter" gesetzt');
+          const criteria = await generateFilterCriteria(
+            filterContext,
+            apiKey,
+            selectedFilters,
+            addStatus
+          );
 
-                    const filterContext = {
-                      itemName: tool.name,
-                      itemType: 'tool' as const,
-                      educationalLevel: currentTemplate.context.educational_level,
-                      subject: currentTemplate.context.subject,
-                      activityName: activity.name,
-                      roleName: role.role_name,
-                      taskDescription: role.task_description,
-                      template: currentTemplate
-                    };
+          updatedEnvironments[envIndex].tools[i] = {
+            ...tool,
+            filter_criteria: criteria,
+            source: 'filter'
+          };
+          totalProcessed++;
+        }
 
-                    tool.filter_criteria = await generateFilterCriteria(
-                      filterContext,
-                      apiKey,
-                      selectedFilters,
-                      addStatus
-                    );
-                  }
-                }
+        // Process services
+        for (let i = 0; i < env.services.length; i++) {
+          const service = env.services[i];
+          addStatus(`\n🔌 Verarbeite Dienst: ${service.name}`);
+          
+          const filterContext = {
+            itemName: service.name,
+            itemType: 'service' as const,
+            educationalLevel: currentTemplate.context.educational_level,
+            subject: currentTemplate.context.subject,
+            activityName: '',
+            roleName: '',
+            taskDescription: '',
+            template: currentTemplate
+          };
 
-                // Process services
-                for (const service of environment.services) {
-                  if (role.learning_environment?.selected_services?.includes(service.id)) {
-                    addStatus(`\nVerarbeite Dienst: ${service.name}`);
-                    
-                    service.source = 'filter';
-                    addStatus('Dienst-Quelle auf "filter" gesetzt');
+          const criteria = await generateFilterCriteria(
+            filterContext,
+            apiKey,
+            selectedFilters,
+            addStatus
+          );
 
-                    const filterContext = {
-                      itemName: service.name,
-                      itemType: 'service' as const,
-                      educationalLevel: currentTemplate.context.educational_level,
-                      subject: currentTemplate.context.subject,
-                      activityName: activity.name,
-                      roleName: role.role_name,
-                      taskDescription: role.task_description,
-                      template: currentTemplate
-                    };
-
-                    service.filter_criteria = await generateFilterCriteria(
-                      filterContext,
-                      apiKey,
-                      selectedFilters,
-                      addStatus
-                    );
-                  }
-                }
-              }
-            }
-          }
+          updatedEnvironments[envIndex].services[i] = {
+            ...service,
+            filter_criteria: criteria,
+            source: 'filter'
+          };
+          totalProcessed++;
         }
       }
 
-      state.setEnvironments(updatedTemplate.environments);
+      // Update environments in store
+      state.setEnvironments(updatedEnvironments);
       setSuccess(true);
-      addStatus('\nAlle Filter wurden erfolgreich generiert und angewendet!');
+      addStatus(`\n✅ Verarbeitung abgeschlossen! ${totalProcessed} Ressourcen wurden mit Filterkriterien versehen.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
+      addStatus('\n❌ Fehler bei der Verarbeitung');
     } finally {
       setLoading(false);
     }

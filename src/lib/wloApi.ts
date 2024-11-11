@@ -34,6 +34,7 @@ export async function searchWLO({
   maxItems = 5,
   skipCount = 0,
   propertyFilter = '-all-',
+  endpoint,
   combineMode = 'OR'
 }: WLOSearchParams) {
   const params = new URLSearchParams();
@@ -61,16 +62,19 @@ export async function searchWLO({
       maxItems,
       skipCount,
       propertyFilter,
-      combineMode
+      combineMode,
+      endpoint
     });
 
-    const response = await fetch(`/api/wlo/search/v1/custom/-home-?${params.toString()}`, {
+    // Direkter Aufruf der edu-sharing API mit CORS-Headers
+    const response = await fetch(`${endpoint}/search/v1/custom/-home-?${params.toString()}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
         'Cache-Control': 'no-cache'
       },
-      signal: controller.signal
+      signal: controller.signal,
+      mode: 'cors'
     });
 
     clearTimeout(timeoutId);
