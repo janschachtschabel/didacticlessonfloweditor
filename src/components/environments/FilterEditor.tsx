@@ -33,14 +33,14 @@ export function FilterEditor({ filter, onChange }: FilterEditorProps) {
           type="text"
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
-          placeholder="Property"
+          placeholder="Eigenschaft"
           className="p-2 border rounded"
         />
         <input
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
-          placeholder="Value"
+          placeholder="Wert"
           className="p-2 border rounded"
         />
       </div>
@@ -49,7 +49,7 @@ export function FilterEditor({ filter, onChange }: FilterEditorProps) {
         onClick={handleAddCriteria}
         className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
-        Add Criteria
+        Kriterium hinzufügen
       </button>
 
       <div className="space-y-2">

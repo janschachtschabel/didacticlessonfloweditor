@@ -6,6 +6,7 @@ interface PhaseEditorProps {
   phase: Phase;
   actors: Actor[];
   environments: LearningEnvironment[];
+  availablePhases: Phase[];
   onUpdate: (updates: Partial<Phase>) => void;
   onDelete: () => void;
 }
@@ -14,6 +15,7 @@ export function PhaseEditor({
   phase,
   actors,
   environments,
+  availablePhases,
   onUpdate,
   onDelete
 }: PhaseEditorProps) {
@@ -45,12 +47,48 @@ export function PhaseEditor({
 
   const handleUpdateActivity = (index: number, updates: any) => {
     const newActivities = [...(phase.activities || [])];
-    newActivities[index] = { ...newActivities[index], ...updates };
+    const activity = newActivities[index];
+
+    // If prerequisite activity is being updated
+    if ('prerequisite_activity' in updates) {
+      const oldPrereq = activity.prerequisite_activity;
+      const newPrereq = updates.prerequisite_activity;
+
+      // Remove this activity from old prerequisite's next list
+      if (oldPrereq) {
+        const oldPrereqAct = newActivities.find(a => a.activity_id === oldPrereq);
+        if (oldPrereqAct) {
+          oldPrereqAct.next_activity = oldPrereqAct.next_activity.filter(
+            id => id !== activity.activity_id
+          );
+        }
+      }
+
+      // Add this activity to new prerequisite's next list
+      if (newPrereq) {
+        const newPrereqAct = newActivities.find(a => a.activity_id === newPrereq);
+        if (newPrereqAct && !newPrereqAct.next_activity.includes(activity.activity_id)) {
+          newPrereqAct.next_activity.push(activity.activity_id);
+        }
+      }
+    }
+
+    Object.assign(activity, updates);
     onUpdate({ activities: newActivities });
   };
 
   const handleDeleteActivity = (index: number) => {
     const newActivities = [...(phase.activities || [])];
+    const activity = newActivities[index];
+
+    // Update relationships when deleting an activity
+    if (activity.prerequisite_activity) {
+      const prereqAct = newActivities.find(a => a.activity_id === activity.prerequisite_activity);
+      if (prereqAct) {
+        prereqAct.next_activity = prereqAct.next_activity.filter(id => id !== activity.activity_id);
+      }
+    }
+
     newActivities.splice(index, 1);
     onUpdate({ activities: newActivities });
   };
@@ -66,13 +104,13 @@ export function PhaseEditor({
             <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
               ▶
             </span>
-            {phase.phase_name || 'Unnamed Phase'}
+            {phase.phase_name || 'Unbenannte Phase'}
           </button>
           <button
             onClick={onDelete}
             className="text-red-500 hover:text-red-700"
           >
-            Remove
+            Entfernen
           </button>
         </div>
 
@@ -80,7 +118,7 @@ export function PhaseEditor({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Phase Name</label>
+                <label className="block text-sm font-medium text-gray-700">Name der Phase</label>
                 <input
                   type="text"
                   value={phase.phase_name}
@@ -90,7 +128,7 @@ export function PhaseEditor({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Time Frame</label>
+                <label className="block text-sm font-medium text-gray-700">Zeitrahmen</label>
                 <input
                   type="text"
                   value={phase.time_frame}
@@ -101,7 +139,7 @@ export function PhaseEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Learning Goal</label>
+              <label className="block text-sm font-medium text-gray-700">Lernziel</label>
               <textarea
                 value={phase.learning_goal}
                 onChange={(e) => onUpdate({ learning_goal: e.target.value })}
@@ -110,37 +148,39 @@ export function PhaseEditor({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Prerequisite Phase</label>
-                <input
-                  type="text"
-                  value={phase.prerequisite_phase || ''}
-                  onChange={(e) => onUpdate({ prerequisite_phase: e.target.value || null })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Next Phase</label>
-                <input
-                  type="text"
-                  value={phase.next_phase || ''}
-                  onChange={(e) => onUpdate({ next_phase: e.target.value || null })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Voraussetzende Phase</label>
+              <select
+                value={phase.prerequisite_phase || ''}
+                onChange={(e) => onUpdate({ prerequisite_phase: e.target.value || null })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">Keine</option>
+                {availablePhases.map(p => (
+                  <option key={p.phase_id} value={p.phase_id}>
+                    {p.phase_name || p.phase_id}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {/* Activities Section */}
+            {phase.next_phase && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Nächste Phase</label>
+                <div className="mt-1 text-sm text-gray-500">
+                  {availablePhases.find(p => p.phase_id === phase.next_phase)?.phase_name || phase.next_phase}
+                </div>
+              </div>
+            )}
+
             <div className="border-t pt-4">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-medium">Activities</h4>
+                <h4 className="text-lg font-medium">Aktivitäten</h4>
                 <button
                   onClick={handleAddActivity}
                   className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                  Add Activity
+                  Aktivität hinzufügen
                 </button>
               </div>
 
@@ -151,6 +191,7 @@ export function PhaseEditor({
                     activity={activity}
                     actors={actors}
                     environments={environments}
+                    availableActivities={phase.activities.filter((_, idx) => idx !== index)}
                     onUpdate={(updates) => handleUpdateActivity(index, updates)}
                     onDelete={() => handleDeleteActivity(index)}
                   />

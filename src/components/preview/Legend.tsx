@@ -6,60 +6,60 @@ export const Legend: FC = () => (
     <div className="space-y-2 text-sm">
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-gray-100 border-2 border-gray-500"></div>
-        <span>Solution</span>
+        <span>Lösung</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-blue-100 border-2 border-blue-500"></div>
-        <span>Learning Sequences</span>
+        <span>Lernsequenzen</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-green-100 border-2 border-green-500"></div>
-        <span>Phases</span>
+        <span>Phasen</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-yellow-100 border-2 border-yellow-500"></div>
-        <span>Activities</span>
+        <span>Aktivitäten</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-orange-100 border-2 border-orange-500"></div>
-        <span>Roles</span>
+        <span>Rollen</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-pink-100 border-2 border-pink-500"></div>
-        <span>Actors</span>
+        <span>Akteure</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-purple-100 border-2 border-purple-500"></div>
-        <span>Learning Environments</span>
+        <span>Lernumgebungen</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-red-100 border-2 border-red-500"></div>
-        <span>Materials</span>
+        <span>Lernressourcen</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-indigo-100 border-2 border-indigo-500"></div>
-        <span>Tools</span>
+        <span>Werkzeuge</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-4 h-4 bg-teal-100 border-2 border-teal-500"></div>
-        <span>Services</span>
+        <span>Dienste</span>
       </div>
       <div className="mt-4 space-y-1">
         <div className="flex items-center gap-2">
           <div className="w-8 h-0 border-t-2 border-solid"></div>
-          <span>Contains/Implements</span>
+          <span>Enthält/Implementiert</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-0 border-t-2 border-dashed"></div>
-          <span>References</span>
+          <span>Referenziert</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-0 border-t-2 border-orange-500"></div>
-          <span>Sequential Flow</span>
+          <span>Sequenzieller Ablauf</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-0 border-t-2 border-purple-500"></div>
-          <span>Parallel Execution</span>
+          <span>Parallele Ausführung</span>
         </div>
       </div>
     </div>

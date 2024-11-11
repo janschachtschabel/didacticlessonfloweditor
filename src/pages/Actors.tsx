@@ -14,7 +14,7 @@ export function Actors() {
       name: '',
       type: 'human',
       demographic_data: {
-        age: '',
+        age: undefined,
         gender: '',
         ethnic_background: '',
       },
@@ -58,16 +58,8 @@ export function Actors() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Actors</h1>
-        <button
-          onClick={handleAddActor}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Add Actor
-        </button>
-      </div>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Akteure</h1>
 
       <div className="space-y-6">
         {actors.map((actor) => (
@@ -89,6 +81,13 @@ export function Actors() {
           </div>
         ))}
       </div>
+
+      <button
+        onClick={handleAddActor}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Akteur hinzufügen
+      </button>
     </div>
   );
 }

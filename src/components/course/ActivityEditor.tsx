@@ -77,13 +77,13 @@ export function ActivityEditor({
             <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
               ▶
             </span>
-            {activity.name || 'Unnamed Activity'}
+            {activity.name || 'Unbenannte Aktivität'}
           </button>
           <button
             onClick={onDelete}
             className="text-red-500 hover:text-red-700"
           >
-            Remove
+            Entfernen
           </button>
         </div>
 
@@ -91,7 +91,7 @@ export function ActivityEditor({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Activity Name</label>
+                <label className="block text-sm font-medium text-gray-700">Name der Aktivität</label>
                 <input
                   type="text"
                   value={activity.name}
@@ -101,7 +101,7 @@ export function ActivityEditor({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                <label className="block text-sm font-medium text-gray-700">Dauer (Minuten)</label>
                 <input
                   type="number"
                   value={activity.duration}
@@ -112,7 +112,7 @@ export function ActivityEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <label className="block text-sm font-medium text-gray-700">Beschreibung</label>
               <textarea
                 value={activity.description}
                 onChange={(e) => onUpdate({ description: e.target.value })}
@@ -122,7 +122,7 @@ export function ActivityEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Goal</label>
+              <label className="block text-sm font-medium text-gray-700">Ziel</label>
               <textarea
                 value={activity.goal}
                 onChange={(e) => onUpdate({ goal: e.target.value })}
@@ -133,7 +133,7 @@ export function ActivityEditor({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Prerequisite Activity</label>
+                <label className="block text-sm font-medium text-gray-700">Voraussetzende Aktivität</label>
                 <input
                   type="text"
                   value={activity.prerequisite_activity || ''}
@@ -143,24 +143,22 @@ export function ActivityEditor({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Transition Type</label>
+                <label className="block text-sm font-medium text-gray-700">Übergangstyp</label>
                 <select
                   value={activity.transition_type}
                   onChange={(e) => onUpdate({ transition_type: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="sequential">Sequential</option>
+                  <option value="sequential">Sequenziell</option>
                   <option value="parallel">Parallel</option>
-                  <option value="conditional">Conditional</option>
-                  <option value="all_completed">All Completed</option>
-                  <option value="one_of">One Of</option>
+                  <option value="conditional">Bedingt</option>
                 </select>
               </div>
             </div>
 
             {activity.transition_type === 'conditional' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Condition Description</label>
+                <label className="block text-sm font-medium text-gray-700">Bedingungsbeschreibung</label>
                 <textarea
                   value={activity.condition_description || ''}
                   onChange={(e) => onUpdate({ condition_description: e.target.value || null })}
@@ -170,24 +168,23 @@ export function ActivityEditor({
               </div>
             )}
 
-            {/* Assessment Section */}
             <div className="border-t pt-4">
-              <h4 className="text-lg font-medium mb-4">Assessment</h4>
+              <h4 className="text-lg font-medium mb-4">Bewertung</h4>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Type</label>
+                  <label className="block text-sm font-medium text-gray-700">Typ</label>
                   <select
                     value={assessment.type}
                     onChange={(e) => handleUpdateAssessment({ type: e.target.value as 'formative' | 'summative' })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   >
-                    <option value="formative">Formative</option>
-                    <option value="summative">Summative</option>
+                    <option value="formative">Formativ</option>
+                    <option value="summative">Summativ</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Methods (comma-separated)</label>
+                  <label className="block text-sm font-medium text-gray-700">Methoden (kommagetrennt)</label>
                   <input
                     type="text"
                     value={assessment.methods.join(', ')}
@@ -199,7 +196,7 @@ export function ActivityEditor({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Criteria (comma-separated)</label>
+                  <label className="block text-sm font-medium text-gray-700">Kriterien (kommagetrennt)</label>
                   <input
                     type="text"
                     value={assessment.criteria.join(', ')}
@@ -212,15 +209,14 @@ export function ActivityEditor({
               </div>
             </div>
 
-            {/* Roles Section */}
             <div className="border-t pt-4">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-medium">Roles</h4>
+                <h4 className="text-lg font-medium">Rollen</h4>
                 <button
                   onClick={handleAddRole}
                   className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                  Add Role
+                  Rolle hinzufügen
                 </button>
               </div>
 

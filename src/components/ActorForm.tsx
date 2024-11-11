@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Actor, ActorType, MotivationType, MotivationLevel } from '../store/templateStore';
+import type { Actor, ActorType, MotivationType, MotivationLevel } from '../store/templateStore';
 
 interface ActorFormProps {
   actor: Actor;
@@ -14,9 +14,9 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
   const validateField = (name: string, value: any): string => {
     switch (name) {
       case 'name':
-        return !value ? 'Name is required' : '';
+        return !value ? 'Name ist erforderlich' : '';
       case 'age':
-        return value && (isNaN(value) || value < 0) ? 'Age must be a positive number' : '';
+        return value && (isNaN(value) || value < 0) ? 'Alter muss eine positive Zahl sein' : '';
       default:
         return '';
     }
@@ -72,50 +72,50 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Type</label>
+          <label className="block text-sm font-medium mb-1">Typ</label>
           <select
             value={actor.type}
             onChange={(e) => onUpdate({ type: e.target.value as ActorType })}
             className="w-full p-2 border rounded"
           >
-            <option value="human">Human</option>
-            <option value="group">Group</option>
-            <option value="ai">AI</option>
+            <option value="Einzelperson">Einzelperson</option>
+            <option value="Gruppe">Gruppe</option>
+            <option value="KI">KI</option>
           </select>
         </div>
       </div>
 
-      {/* Demographic Data */}
+      {/* Demografische Daten */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Demographic Data</h3>
+        <h3 className="text-lg font-medium mb-4">Demografische Daten</h3>
         <div className="grid grid-cols-2 gap-4">
-          {actor.type === 'group' ? (
+          {actor.type === 'Gruppe' ? (
             <>
               <div>
-                <label className="block text-sm font-medium mb-1">Age Range</label>
+                <label className="block text-sm font-medium mb-1">Altersbereich</label>
                 <input
                   type="text"
                   value={actor.demographic_data.age_range || ''}
                   onChange={(e) => handleInputChange(e, 'age_range', 'demographic_data')}
                   className="w-full p-2 border rounded"
-                  placeholder="e.g., 14-16"
+                  placeholder="z.B. 14-16"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Gender Distribution</label>
+                <label className="block text-sm font-medium mb-1">Geschlechterverteilung</label>
                 <input
                   type="text"
                   value={actor.demographic_data.gender_distribution || ''}
                   onChange={(e) => handleInputChange(e, 'gender_distribution', 'demographic_data')}
                   className="w-full p-2 border rounded"
-                  placeholder="e.g., mixed"
+                  placeholder="z.B. gemischt"
                 />
               </div>
             </>
           ) : (
             <>
               <div>
-                <label className="block text-sm font-medium mb-1">Age</label>
+                <label className="block text-sm font-medium mb-1">Alter</label>
                 <input
                   type="number"
                   value={actor.demographic_data.age || ''}
@@ -125,7 +125,7 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
                 {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Gender</label>
+                <label className="block text-sm font-medium mb-1">Geschlecht</label>
                 <input
                   type="text"
                   value={actor.demographic_data.gender || ''}
@@ -136,7 +136,7 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
             </>
           )}
           <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Ethnic Background</label>
+            <label className="block text-sm font-medium mb-1">Ethnischer Hintergrund</label>
             <input
               type="text"
               value={actor.demographic_data.ethnic_background}
@@ -147,12 +147,12 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         </div>
       </div>
 
-      {/* Education */}
+      {/* Bildung */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Education</h3>
+        <h3 className="text-lg font-medium mb-4">Bildung</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Education Level</label>
+            <label className="block text-sm font-medium mb-1">Bildungsniveau</label>
             <input
               type="text"
               value={actor.education.education_level}
@@ -161,7 +161,7 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Class Level</label>
+            <label className="block text-sm font-medium mb-1">Klassenstufe</label>
             <input
               type="text"
               value={actor.education.class_level}
@@ -170,7 +170,7 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
             />
           </div>
           <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Subject Focus</label>
+            <label className="block text-sm font-medium mb-1">Fachlicher Schwerpunkt</label>
             <input
               type="text"
               value={actor.education.subject_focus}
@@ -181,103 +181,139 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         </div>
       </div>
 
-      {/* Competencies */}
+      {/* Kompetenzen */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Competencies</h3>
+        <h3 className="text-lg font-medium mb-4">Kompetenzen</h3>
         <div className="space-y-4">
-          {['subject', 'cognitive', 'methodical', 'affective', 'digital'].map((type) => (
-            <div key={type}>
-              <label className="block text-sm font-medium mb-1">
-                {type.charAt(0).toUpperCase() + type.slice(1)} Competencies
-              </label>
-              <input
-                type="text"
-                value={actor.competencies[`${type}_competencies` as keyof typeof actor.competencies].join(', ')}
-                onChange={(e) => handleArrayInput(e.target.value, `${type}_competencies`, 'competencies')}
-                className="w-full p-2 border rounded"
-                placeholder="Enter comma-separated values"
-              />
-            </div>
-          ))}
-          
-          {/* Language Skills */}
           <div>
-            <label className="block text-sm font-medium mb-1">Languages</label>
+            <label className="block text-sm font-medium mb-1">Fachkompetenzen</label>
+            <input
+              type="text"
+              value={actor.competencies.subject_competencies.join(', ')}
+              onChange={(e) => handleArrayInput(e.target.value, 'subject_competencies', 'competencies')}
+              className="w-full p-2 border rounded"
+              placeholder="Kommagetrennte Liste"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Kognitive Kompetenzen</label>
+            <input
+              type="text"
+              value={actor.competencies.cognitive_competencies.join(', ')}
+              onChange={(e) => handleArrayInput(e.target.value, 'cognitive_competencies', 'competencies')}
+              className="w-full p-2 border rounded"
+              placeholder="Kommagetrennte Liste"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Methodische Kompetenzen</label>
+            <input
+              type="text"
+              value={actor.competencies.methodical_competencies.join(', ')}
+              onChange={(e) => handleArrayInput(e.target.value, 'methodical_competencies', 'competencies')}
+              className="w-full p-2 border rounded"
+              placeholder="Kommagetrennte Liste"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Affektive Kompetenzen</label>
+            <input
+              type="text"
+              value={actor.competencies.affective_competencies.join(', ')}
+              onChange={(e) => handleArrayInput(e.target.value, 'affective_competencies', 'competencies')}
+              className="w-full p-2 border rounded"
+              placeholder="Kommagetrennte Liste"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Digitale Kompetenzen</label>
+            <input
+              type="text"
+              value={actor.competencies.digital_competencies.join(', ')}
+              onChange={(e) => handleArrayInput(e.target.value, 'digital_competencies', 'competencies')}
+              className="w-full p-2 border rounded"
+              placeholder="Kommagetrennte Liste"
+            />
+          </div>
+          
+          {/* Sprachkenntnisse */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Sprachen</label>
             <input
               type="text"
               value={actor.competencies.language_skills.languages.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'languages', 'language_skills')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated languages"
+              placeholder="Kommagetrennte Liste der Sprachen"
             />
           </div>
         </div>
       </div>
 
-      {/* Learning Requirements */}
+      {/* Lernanforderungen */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Learning Requirements</h3>
+        <h3 className="text-lg font-medium mb-4">Lernanforderungen</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Learning Preferences</label>
+            <label className="block text-sm font-medium mb-1">Lernpräferenzen</label>
             <input
               type="text"
               value={actor.learning_requirements.learning_preferences.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'learning_preferences', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated preferences"
+              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Special Needs</label>
+            <label className="block text-sm font-medium mb-1">Besondere Bedürfnisse</label>
             <input
               type="text"
               value={actor.learning_requirements.special_needs.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'special_needs', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated needs"
+              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Technical Requirements</label>
+            <label className="block text-sm font-medium mb-1">Technische Anforderungen</label>
             <input
               type="text"
               value={actor.learning_requirements.technical_requirements.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'technical_requirements', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated requirements"
+              placeholder="Kommagetrennte Liste"
             />
           </div>
         </div>
       </div>
 
-      {/* Interests and Goals */}
+      {/* Interessen und Ziele */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Interests and Goals</h3>
+        <h3 className="text-lg font-medium mb-4">Interessen und Ziele</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Interests</label>
+            <label className="block text-sm font-medium mb-1">Interessen</label>
             <input
               type="text"
               value={actor.interests_and_goals.interests.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'interests', 'interests_and_goals')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated interests"
+              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Goals</label>
+            <label className="block text-sm font-medium mb-1">Ziele</label>
             <input
               type="text"
               value={actor.interests_and_goals.goals.join(', ')}
               onChange={(e) => handleArrayInput(e.target.value, 'goals', 'interests_and_goals')}
               className="w-full p-2 border rounded"
-              placeholder="Enter comma-separated goals"
+              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Motivation Type</label>
+              <label className="block text-sm font-medium mb-1">Motivationstyp</label>
               <select
                 value={actor.interests_and_goals.motivation.type}
                 onChange={(e) => onUpdate({
@@ -291,12 +327,12 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
                 })}
                 className="w-full p-2 border rounded"
               >
-                <option value="intrinsic">Intrinsic</option>
-                <option value="extrinsic">Extrinsic</option>
+                <option value="intrinsic">Intrinsisch</option>
+                <option value="extrinsic">Extrinsisch</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Motivation Level</label>
+              <label className="block text-sm font-medium mb-1">Motivationsniveau</label>
               <select
                 value={actor.interests_and_goals.motivation.level}
                 onChange={(e) => onUpdate({
@@ -310,35 +346,35 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
                 })}
                 className="w-full p-2 border rounded"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low">Niedrig</option>
+                <option value="medium">Mittel</option>
+                <option value="high">Hoch</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Social Structure */}
+      {/* Sozialstruktur */}
       <div className="border p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-4">Social Structure</h3>
+        <h3 className="text-lg font-medium mb-4">Sozialstruktur</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Group Size</label>
+            <label className="block text-sm font-medium mb-1">Gruppengröße</label>
             <input
-              type={actor.type === 'group' ? 'text' : 'number'}
+              type={actor.type === 'Gruppe' ? 'text' : 'number'}
               value={actor.social_structure.group_size}
               onChange={(e) => onUpdate({
                 social_structure: {
                   ...actor.social_structure,
-                  group_size: actor.type === 'group' ? e.target.value : parseInt(e.target.value)
+                  group_size: actor.type === 'Gruppe' ? e.target.value : parseInt(e.target.value)
                 }
               })}
               className="w-full p-2 border rounded"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Heterogeneity</label>
+            <label className="block text-sm font-medium mb-1">Heterogenität</label>
             <input
               type="text"
               value={actor.social_structure.heterogeneity}
@@ -359,14 +395,14 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
           onClick={onCancel}
           className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
         >
-          Cancel
+          Abbrechen
         </button>
         <button
           onClick={onSave}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           disabled={Object.keys(errors).some(key => errors[key])}
         >
-          Save
+          Speichern
         </button>
       </div>
     </div>

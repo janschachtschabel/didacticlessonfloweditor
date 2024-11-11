@@ -1,5 +1,7 @@
 import { useTemplateStore } from '../store/templateStore';
 import { exampleTemplate } from '../data/exampleTemplate';
+import { DocumentArrowDownIcon, DocumentArrowUpIcon, DocumentPlusIcon, TrashIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { generatePDF } from '../lib/pdfGenerator';
 
 export function SaveLoad() {
   const state = useTemplateStore();
@@ -56,7 +58,7 @@ export function SaveLoad() {
         if (template.environments) state.setEnvironments(template.environments);
       } catch (error) {
         console.error('Error loading template:', error);
-        alert('Error loading template file');
+        alert('Fehler beim Laden der Vorlage');
       }
     };
     reader.readAsText(file);
@@ -92,16 +94,15 @@ export function SaveLoad() {
     state.setEnvironments([]);
   };
 
+  const handleGeneratePDF = async () => {
+    await generatePDF(state);
+  };
+
   return (
     <div className="flex justify-end space-x-4">
-      <button
-        onClick={handleSave}
-        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-      >
-        Template speichern
-      </button>
-      <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer">
-        Template laden
+      <label className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer flex items-center gap-2">
+        <DocumentArrowUpIcon className="w-5 h-5" />
+        Vorlage laden
         <input
           type="file"
           accept=".json"
@@ -109,16 +110,36 @@ export function SaveLoad() {
           className="hidden"
         />
       </label>
+
+      <button
+        onClick={handleSave}
+        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center gap-2"
+      >
+        <DocumentArrowDownIcon className="w-5 h-5" />
+        Vorlage speichern
+      </button>
+
+      <button
+        onClick={handleGeneratePDF}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
+      >
+        <DocumentTextIcon className="w-5 h-5" />
+        PDF generieren
+      </button>
+
       <button
         onClick={handleLoadExample}
-        className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+        className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center gap-2"
       >
+        <DocumentPlusIcon className="w-5 h-5" />
         Beispiel laden
       </button>
+
       <button
         onClick={handleClear}
-        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-2"
       >
+        <TrashIcon className="w-5 h-5" />
         Alles löschen
       </button>
     </div>

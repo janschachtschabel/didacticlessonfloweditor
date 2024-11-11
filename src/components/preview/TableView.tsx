@@ -22,14 +22,14 @@ export function TableView() {
   if (!sequences.length) {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-500">No learning sequences available.</p>
+        <p className="text-gray-500">Keine Lernsequenzen verfügbar.</p>
       </div>
     );
   }
 
   const getEnvironmentName = (environmentId: string) => {
     const environment = state.environments.find(env => env.id === environmentId);
-    return environment?.name || 'Unknown Environment';
+    return environment?.name || 'Unbekannte Lernumgebung';
   };
 
   const getResourceNames = (environmentId: string, selectedIds: string[] = [], type: 'materials' | 'tools' | 'services') => {
@@ -50,14 +50,14 @@ export function TableView() {
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Activity Details
+              Aktivitätsdetails
             </th>
             {actors.map(actor => (
               <th 
                 key={actor.id}
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                {actor.name || 'Unnamed Actor'}
+                {actor.name || 'Unbenannter Akteur'}
               </th>
             ))}
           </tr>
@@ -70,7 +70,7 @@ export function TableView() {
                   colSpan={actors.length + 1} 
                   className="px-6 py-4 font-medium"
                 >
-                  {sequence.sequence_name || sequence.sequence_id} ({sequence.time_frame || 'No time frame'})
+                  {sequence.sequence_name || sequence.sequence_id} ({sequence.time_frame || 'Keine Zeitangabe'})
                 </td>
               </tr>
 
@@ -81,7 +81,7 @@ export function TableView() {
                       colSpan={actors.length + 1} 
                       className="px-6 py-4 pl-8 font-medium"
                     >
-                      {phase.phase_name || phase.phase_id} ({phase.time_frame || 'No time frame'})
+                      {phase.phase_name || phase.phase_id} ({phase.time_frame || 'Keine Zeitangabe'})
                     </td>
                   </tr>
 
@@ -110,33 +110,35 @@ export function TableView() {
                         <td className="px-6 py-4 pl-12">
                           <div className="font-medium">{activity.name || activity.activity_id}</div>
                           <div className="text-sm text-gray-500">{activity.description}</div>
-                          <div className="text-sm text-gray-500">Duration: {activity.duration} min</div>
+                          <div className="text-sm text-gray-500">Dauer: {activity.duration} min</div>
                         </td>
                         
                         {actors.map(actor => (
                           <td key={actor.id} className="px-6 py-4">
                             {actorRoles[actor.id]?.map((roleInfo, index) => (
                               <div key={`${roleInfo.role.role_name}-${index}`} className="mb-4">
-                                <div className="font-medium">{roleInfo.role.role_name || 'Unnamed Role'}</div>
+                                <div className="font-medium">{roleInfo.role.role_name || 'Unbenannte Rolle'}</div>
                                 <div className="text-sm text-gray-500">{roleInfo.role.task_description}</div>
-                                <div className="text-sm text-gray-600 mt-2">
-                                  Environment: {roleInfo.environmentName}
+                                <div className="mt-2 space-y-1">
+                                  <div className="text-sm text-gray-600">
+                                    Lernumgebung: {roleInfo.environmentName}
+                                  </div>
+                                  {roleInfo.materials.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      Lernressourcen: {roleInfo.materials.join(', ')}
+                                    </div>
+                                  )}
+                                  {roleInfo.tools.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      Werkzeuge: {roleInfo.tools.join(', ')}
+                                    </div>
+                                  )}
+                                  {roleInfo.services.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      Dienste: {roleInfo.services.join(', ')}
+                                    </div>
+                                  )}
                                 </div>
-                                {roleInfo.materials.length > 0 && (
-                                  <div className="text-sm text-gray-600">
-                                    Materials: {roleInfo.materials.join(', ')}
-                                  </div>
-                                )}
-                                {roleInfo.tools.length > 0 && (
-                                  <div className="text-sm text-gray-600">
-                                    Tools: {roleInfo.tools.join(', ')}
-                                  </div>
-                                )}
-                                {roleInfo.services.length > 0 && (
-                                  <div className="text-sm text-gray-600">
-                                    Services: {roleInfo.services.join(', ')}
-                                  </div>
-                                )}
                               </div>
                             ))}
                           </td>

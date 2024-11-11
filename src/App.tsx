@@ -8,6 +8,7 @@ import { CourseFlow } from './pages/CourseFlow';
 import { Preview } from './pages/Preview';
 import { AIFlowAgent } from './pages/AIFlowAgent';
 import { AIFilterAgent } from './pages/AIFilterAgent';
+import { WLOAgent } from './pages/WLOAgent';
 import { SaveLoad } from './components/SaveLoad';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/preview" element={<Preview />} />
               <Route path="/ai-flow-agent" element={<AIFlowAgent />} />
               <Route path="/ai-filter-agent" element={<AIFilterAgent />} />
+              <Route path="/wlo-agent" element={<WLOAgent />} />
             </Routes>
           </div>
         </div>

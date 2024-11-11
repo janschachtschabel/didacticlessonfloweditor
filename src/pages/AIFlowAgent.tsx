@@ -13,7 +13,7 @@ const AI_MODELS = [
 export function AIFlowAgent() {
   const state = useTemplateStore();
   const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState('gpt-4o');
+  const [model, setModel] = useState('gpt-4o-mini');
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +36,12 @@ export function AIFlowAgent() {
 
   const handleProcess = async () => {
     if (!apiKey) {
-      setError('Please enter your OpenAI API key');
+      setError('Bitte geben Sie Ihren OpenAI API-Schlüssel ein');
       return;
     }
 
     if (!userInput) {
-      setError('Please enter your instructions');
+      setError('Bitte geben Sie Ihre Anweisungen ein');
       return;
     }
 
@@ -68,7 +68,7 @@ export function AIFlowAgent() {
       setSuccess(true);
       setUserInput('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
     } finally {
       setLoading(false);
     }
@@ -76,11 +76,11 @@ export function AIFlowAgent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">AI Flow Agent</h1>
+      <h1 className="text-2xl font-bold">KI Ablauf</h1>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">OpenAI API Key</label>
+          <label className="block text-sm font-medium text-gray-700">OpenAI API-Schlüssel</label>
           <input
             type="password"
             value={apiKey}
@@ -91,7 +91,7 @@ export function AIFlowAgent() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">AI Model</label>
+          <label className="block text-sm font-medium text-gray-700">KI-Modell</label>
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
@@ -108,26 +108,27 @@ export function AIFlowAgent() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Current Template
+          Aktuelles Template
         </label>
         <div className="h-[40vh] border rounded-lg overflow-hidden bg-gray-50">
           <Editor
             value={JSON.stringify(currentTemplate, null, 2)}
             onChange={() => {}}
+            readOnly
           />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Instructions for AI
+          Anweisungen für KI
         </label>
         <textarea
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           rows={4}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Enter your instructions for modifying the template..."
+          placeholder="Geben Sie Ihre Anweisungen für die Anpassung des Templates ein..."
         />
       </div>
 
@@ -139,7 +140,7 @@ export function AIFlowAgent() {
 
       {success && (
         <div className="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-          <span className="block sm:inline">Template successfully updated!</span>
+          <span className="block sm:inline">Template wurde erfolgreich aktualisiert!</span>
         </div>
       )}
 
@@ -153,7 +154,7 @@ export function AIFlowAgent() {
               : 'bg-blue-500 hover:bg-blue-600'
           }`}
         >
-          {loading ? 'Processing...' : 'Process with AI'}
+          {loading ? 'Verarbeite...' : 'Mit KI verarbeiten'}
         </button>
       </div>
     </div>

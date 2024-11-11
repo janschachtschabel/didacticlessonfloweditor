@@ -14,26 +14,69 @@ export async function processTemplate(
   });
 
   const prompt = `
-Please help complete or modify this template based on the user's instructions.
+Als didaktischer Assistent helfen Sie bei der Vervollständigung oder Anpassung dieses Templates.
 
-Current template:
+Aktuelles Template:
 ${JSON.stringify(template, null, 2)}
 
-Example template for reference:
+Beispielvorlage als Referenz:
 ${JSON.stringify(exampleTemplate, null, 2)}
 
-Additional hints for sequencing:
-- Sequential: fixed order of elements
-- Parallel: simultaneous execution of activities
-- Conditional: transitions based on conditions
-- Branching: selection between different paths
-- Looping: repetition of an activity based on feedback
-- Optional activities: voluntary choice between activities
+Wichtige Hinweise zur Erstellung:
 
-User instructions:
+1. Didaktische Struktur:
+   - Klare Problembeschreibung
+   - Spezifische Lernziele
+   - Relevante didaktische Schlüsselwörter
+
+2. Kontext:
+   - Zielgruppendefinition
+   - Fachbereich
+   - Bildungsstufe
+   - Voraussetzungen
+   - Zeitrahmen
+
+3. Sequenzierungsoptionen:
+   - Sequenziell: Feste Reihenfolge der Elemente
+   - Parallel: Gleichzeitige Aktivitäten
+   - Bedingt: Übergänge basieren auf Bedingungen
+   - Verzweigung: Auswahl zwischen verschiedenen Pfaden
+   - Wiederholung: Aktivitätswiederholung basierend auf Feedback
+   - Optional: Freiwillige Aktivitätsauswahl
+
+4. Lernumgebung:
+   - Physischer/virtueller Raum
+   - Lernressourcen (Lerninhalte wie Videos, Arbeitsblätter, Tests etc.)
+   - Werkzeuge und Hilfsmittel
+   - Unterstützende Dienste
+
+5. Akteure und Rollen:
+   - Klare Verantwortlichkeiten
+   - Erforderliche Kompetenzen
+   - Interaktionsmuster
+   - Unterstützungsbedarf
+
+6. Bewertungsintegration:
+   - Formative/summative Methoden
+   - Erfolgskriterien
+   - Feedbackmechanismen
+   - Fortschrittsverfolgung
+
+7. Umsetzungsaspekte:
+   - Ressourcenbedarf
+   - Vorbereitungsbedarf
+   - Potenzielle Herausforderungen
+   - Anpassungsoptionen
+
+8. Begrifflichkeiten:
+   - "Lernressourcen" oder "Lerninhalte" statt "Materialien"
+   - Beispiele für Lernressourcen: Lernvideos, Arbeitsblätter, Dokumente, Wissenstests, 
+     Präsentationen, Übungen, Tutorials, Simulationen, Infografiken, Audiodateien
+
+Anweisungen des Nutzers:
 ${input}
 
-Please return the modified template as a JSON object.
+Bitte geben Sie das angepasste Template als JSON-Objekt zurück.
 `;
 
   const response = await client.chat.completions.create({
@@ -41,7 +84,7 @@ Please return the modified template as a JSON object.
     messages: [
       {
         role: 'system',
-        content: 'You are a helpful assistant.'
+        content: 'Sie sind ein hilfreicher didaktischer Assistent.'
       },
       {
         role: 'user',
@@ -54,7 +97,7 @@ Please return the modified template as a JSON object.
 
   const content = response.choices[0].message.content;
   if (!content) {
-    throw new Error('No response from OpenAI');
+    throw new Error('Keine Antwort vom KI-Modell');
   }
 
   return JSON.parse(content);

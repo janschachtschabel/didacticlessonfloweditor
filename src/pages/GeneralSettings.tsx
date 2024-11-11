@@ -12,12 +12,12 @@ export function GeneralSettings() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">General Settings</h1>
+      <h1 className="text-2xl font-bold">Allgemeine Einstellungen</h1>
       
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Title</label>
+            <label className="block text-sm font-medium text-gray-700">Titel</label>
             <input
               type="text"
               value={metadata.title || ''}
@@ -27,7 +27,7 @@ export function GeneralSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">Beschreibung</label>
             <textarea
               value={metadata.description || ''}
               onChange={(e) => setMetadata({ ...metadata, description: e.target.value })}
@@ -37,7 +37,7 @@ export function GeneralSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Keywords (comma-separated)</label>
+            <label className="block text-sm font-medium text-gray-700">Schlüsselwörter (durch Komma getrennt)</label>
             <input
               type="text"
               value={(metadata.keywords || []).join(', ')}
@@ -47,7 +47,7 @@ export function GeneralSettings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Author</label>
+            <label className="block text-sm font-medium text-gray-700">Autor</label>
             <input
               type="text"
               value={metadata.author || ''}

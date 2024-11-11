@@ -12,16 +12,16 @@ const AI_MODELS = [
 ];
 
 const FILTER_OPTIONS = [
-  { id: FILTER_PROPERTIES.TITLE, label: 'Title search' },
-  { id: FILTER_PROPERTIES.CONTENT_TYPE, label: 'Content type' },
-  { id: FILTER_PROPERTIES.EDUCATIONAL_CONTEXT, label: 'Educational context' },
-  { id: FILTER_PROPERTIES.DISCIPLINE, label: 'Discipline/subject' },
+  { id: FILTER_PROPERTIES.TITLE, label: 'Titelsuche' },
+  { id: FILTER_PROPERTIES.CONTENT_TYPE, label: 'Inhaltstyp' },
+  { id: FILTER_PROPERTIES.EDUCATIONAL_CONTEXT, label: 'Bildungskontext' },
+  { id: FILTER_PROPERTIES.DISCIPLINE, label: 'Fach/Disziplin' },
 ];
 
 export function AIFilterAgent() {
   const state = useTemplateStore();
   const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState('gpt-4o');
+  const [model, setModel] = useState('gpt-4o-mini');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -62,7 +62,7 @@ export function AIFilterAgent() {
 
   const handleProcess = async () => {
     if (!apiKey) {
-      setError('Please enter your OpenAI API key');
+      setError('Bitte geben Sie Ihren OpenAI API-Schlüssel ein');
       return;
     }
 
@@ -76,16 +76,16 @@ export function AIFilterAgent() {
       let updatedTemplate = { ...currentTemplate };
 
       for (const sequence of sequences) {
-        addStatus(`Processing sequence: ${sequence.sequence_name || sequence.sequence_id}`);
+        addStatus(`Verarbeite Sequenz: ${sequence.sequence_name || sequence.sequence_id}`);
         
         for (const phase of sequence.phases || []) {
-          addStatus(`Processing phase: ${phase.phase_name || phase.phase_id}`);
+          addStatus(`Verarbeite Phase: ${phase.phase_name || phase.phase_id}`);
           
           for (const activity of phase.activities || []) {
-            addStatus(`Processing activity: ${activity.name || activity.activity_id}`);
+            addStatus(`Verarbeite Aktivität: ${activity.name || activity.activity_id}`);
             
             for (const role of activity.roles || []) {
-              addStatus(`Processing role: ${role.role_name}`);
+              addStatus(`Verarbeite Rolle: ${role.role_name}`);
               
               const environment = currentTemplate.environments.find(
                 env => env.id === role.learning_environment?.environment_id
@@ -95,11 +95,10 @@ export function AIFilterAgent() {
                 // Process materials
                 for (const material of environment.materials) {
                   if (role.learning_environment?.selected_materials?.includes(material.id)) {
-                    addStatus(`\nProcessing material: ${material.name}`);
+                    addStatus(`\nVerarbeite Material: ${material.name}`);
                     
-                    // First set source to filter
                     material.source = 'filter';
-                    addStatus('Set material source to "filter"');
+                    addStatus('Material-Quelle auf "filter" gesetzt');
 
                     const filterContext = {
                       itemName: material.name,
@@ -112,7 +111,6 @@ export function AIFilterAgent() {
                       template: currentTemplate
                     };
 
-                    // Generate filters one by one
                     material.filter_criteria = await generateFilterCriteria(
                       filterContext,
                       apiKey,
@@ -125,10 +123,10 @@ export function AIFilterAgent() {
                 // Process tools
                 for (const tool of environment.tools) {
                   if (role.learning_environment?.selected_tools?.includes(tool.id)) {
-                    addStatus(`\nProcessing tool: ${tool.name}`);
+                    addStatus(`\nVerarbeite Werkzeug: ${tool.name}`);
                     
                     tool.source = 'filter';
-                    addStatus('Set tool source to "filter"');
+                    addStatus('Werkzeug-Quelle auf "filter" gesetzt');
 
                     const filterContext = {
                       itemName: tool.name,
@@ -153,10 +151,10 @@ export function AIFilterAgent() {
                 // Process services
                 for (const service of environment.services) {
                   if (role.learning_environment?.selected_services?.includes(service.id)) {
-                    addStatus(`\nProcessing service: ${service.name}`);
+                    addStatus(`\nVerarbeite Dienst: ${service.name}`);
                     
                     service.source = 'filter';
-                    addStatus('Set service source to "filter"');
+                    addStatus('Dienst-Quelle auf "filter" gesetzt');
 
                     const filterContext = {
                       itemName: service.name,
@@ -185,9 +183,9 @@ export function AIFilterAgent() {
 
       state.setEnvironments(updatedTemplate.environments);
       setSuccess(true);
-      addStatus('\nAll filters have been successfully generated and applied!');
+      addStatus('\nAlle Filter wurden erfolgreich generiert und angewendet!');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
     } finally {
       setLoading(false);
     }
@@ -195,11 +193,11 @@ export function AIFilterAgent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">AI Filter Agent</h1>
+      <h1 className="text-2xl font-bold">KI Filter</h1>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">OpenAI API Key</label>
+          <label className="block text-sm font-medium text-gray-700">OpenAI API-Schlüssel</label>
           <input
             type="password"
             value={apiKey}
@@ -210,7 +208,7 @@ export function AIFilterAgent() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">AI Model</label>
+          <label className="block text-sm font-medium text-gray-700">KI-Modell</label>
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
@@ -227,7 +225,7 @@ export function AIFilterAgent() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Filter Types to Generate
+          Zu generierende Filtertypen
         </label>
         <div className="space-y-2">
           {FILTER_OPTIONS.map((filter) => (
@@ -246,19 +244,20 @@ export function AIFilterAgent() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Current Template
+          Aktuelles Template
         </label>
         <div className="h-[40vh] border rounded-lg overflow-hidden bg-gray-50">
           <Editor
             value={JSON.stringify(currentTemplate, null, 2)}
             onChange={() => {}}
+            readOnly
           />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Processing Status
+          Verarbeitungsstatus
         </label>
         <div className="h-[20vh] border rounded-lg overflow-y-auto bg-gray-50 p-4 font-mono text-sm whitespace-pre-wrap">
           {status.map((message, index) => (
@@ -275,7 +274,7 @@ export function AIFilterAgent() {
 
       {success && (
         <div className="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-          <span className="block sm:inline">Filters have been successfully generated and applied!</span>
+          <span className="block sm:inline">Filter wurden erfolgreich generiert und angewendet!</span>
         </div>
       )}
 
@@ -289,7 +288,7 @@ export function AIFilterAgent() {
               : 'bg-blue-500 hover:bg-blue-600'
           }`}
         >
-          {loading ? 'Processing...' : 'Generate Filters'}
+          {loading ? 'Verarbeite...' : 'Filter generieren'}
         </button>
       </div>
     </div>

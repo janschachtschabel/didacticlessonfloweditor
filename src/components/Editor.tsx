@@ -1,31 +1,26 @@
-import { Editor as MonacoEditor } from '@monaco-editor/react'
-import { useState } from 'react'
+import { Editor as MonacoEditor } from '@monaco-editor/react';
 
 interface EditorProps {
-  value: string
-  onChange: (value: string) => void
+  value: string;
+  onChange: (value: string) => void;
+  readOnly?: boolean;
 }
 
-export function Editor({ value, onChange }: EditorProps) {
-  const [mounted, setMounted] = useState(false)
-
+export function Editor({ value, onChange, readOnly = false }: EditorProps) {
   return (
-    <div className="h-[500px] border rounded-md">
-      <MonacoEditor
-        height="100%"
-        defaultLanguage="json"
-        value={value}
-        onChange={val => onChange(val || '')}
-        theme="vs-dark"
-        options={{
-          minimap: { enabled: false },
-          fontSize: 14,
-          wordWrap: 'on',
-          formatOnPaste: true,
-          formatOnType: true
-        }}
-        onMount={() => setMounted(true)}
-      />
-    </div>
-  )
+    <MonacoEditor
+      height="400px"
+      language="json"
+      theme="vs-dark"
+      value={value}
+      onChange={(value) => onChange(value || '')}
+      options={{
+        minimap: { enabled: false },
+        readOnly,
+        scrollBeyondLastLine: false,
+        fontSize: 14,
+        wordWrap: 'on'
+      }}
+    />
+  );
 }

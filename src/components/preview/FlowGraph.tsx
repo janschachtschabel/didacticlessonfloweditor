@@ -13,13 +13,24 @@ import { createNodes } from './createNodes';
 import { Legend } from './Legend';
 import 'reactflow/dist/style.css';
 
+interface NodeData {
+  label: JSX.Element;
+}
+
+const createNodeLabel = (content: string[]) => (
+  <div className="p-2 text-sm">
+    {content.map((line, i) => (
+      <div key={i} className={i === 0 ? "font-bold mb-1" : "text-xs mb-1"}>{line}</div>
+    ))}
+  </div>
+);
+
 export const FlowGraph: FC = () => {
   const state = useTemplateStore();
   const { nodes: initialNodes, edges: initialEdges } = createNodes(state);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Update graph when state changes
   useEffect(() => {
     const { nodes: updatedNodes, edges: updatedEdges } = createNodes(state);
     setNodes(updatedNodes);
@@ -35,7 +46,7 @@ export const FlowGraph: FC = () => {
   if (!state.solution?.didactic_template?.learning_sequences?.length) {
     return (
       <div className="h-[800px] border rounded-lg bg-white flex items-center justify-center">
-        <p className="text-gray-500">No learning sequences available to display.</p>
+        <p className="text-gray-500">Keine Lernsequenzen verfügbar.</p>
       </div>
     );
   }
@@ -60,3 +71,5 @@ export const FlowGraph: FC = () => {
     </div>
   );
 };
+
+export default FlowGraph;

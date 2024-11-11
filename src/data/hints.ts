@@ -1,46 +1,56 @@
 export const SEQUENCING_HINTS = `
-Didactic Pattern Guidelines:
+Didaktische Pattern Richtlinien:
 
-1. Problem Structure:
-   - Clear problem description
-   - Specific learning goals
-   - Relevant didactic keywords
+1. Problemstruktur:
+   - Klare Problembeschreibung
+   - Spezifische Lernziele
+   - Relevante didaktische Schlüsselwörter
 
-2. Context Requirements:
-   - Target group definition
-   - Subject area
-   - Educational level
-   - Prerequisites
-   - Time frame
+2. Kontextanforderungen:
+   - Zielgruppendefinition
+   - Fachbereich
+   - Bildungsstufe
+   - Voraussetzungen
+   - Zeitrahmen
 
-3. Sequencing Options:
-   - Sequential: Fixed order of elements
-   - Parallel: Simultaneous activities
-   - Conditional: Transitions based on conditions
-   - Branching: Choice between different paths
-   - Looping: Activity repetition based on feedback
-   - Optional: Voluntary activity selection
+3. Sequenzierungsoptionen:
+   - Sequenziell: Feste Reihenfolge der Elemente
+   - Parallel: Gleichzeitige Aktivitäten
+   - Bedingt: Übergänge basieren auf Bedingungen
+   - Verzweigung: Auswahl zwischen verschiedenen Pfaden
+   - Wiederholung: Aktivitätswiederholung basierend auf Feedback
+   - Optional: Freiwillige Aktivitätsauswahl
 
-4. Learning Environment:
-   - Physical/virtual space
-   - Required materials
-   - Tools and resources
-   - Support services
+4. Lernumgebung:
+   - Physischer/virtueller Raum
+   - Lernressourcen (Lerninhalte):
+     • Lernvideos
+     • Arbeitsblätter
+     • Dokumente
+     • Wissenstests
+     • Präsentationen
+     • Übungen
+     • Tutorials
+     • Simulationen
+     • Infografiken
+     • Audiodateien
+   - Werkzeuge und Hilfsmittel
+   - Unterstützende Dienste
 
-5. Actor Roles:
-   - Clear responsibilities
-   - Required competencies
-   - Interaction patterns
-   - Support needs
+5. Akteure und Rollen:
+   - Klare Verantwortlichkeiten
+   - Erforderliche Kompetenzen
+   - Interaktionsmuster
+   - Unterstützungsbedarf
 
-6. Assessment Integration:
-   - Formative/summative methods
-   - Success criteria
-   - Feedback mechanisms
-   - Progress tracking
+6. Bewertungsintegration:
+   - Formative/summative Methoden
+   - Erfolgskriterien
+   - Feedbackmechanismen
+   - Fortschrittsverfolgung
 
-7. Implementation Considerations:
-   - Resource requirements
-   - Preparation needs
-   - Potential challenges
-   - Adaptation options`;
+7. Umsetzungsaspekte:
+   - Ressourcenbedarf
+   - Vorbereitungsbedarf
+   - Potenzielle Herausforderungen
+   - Anpassungsoptionen`;

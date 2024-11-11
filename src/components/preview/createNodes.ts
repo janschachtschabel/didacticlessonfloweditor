@@ -32,7 +32,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       id: solutionId,
       data: {
         label: createNodeLabel([
-          React.createElement('div', { className: 'font-bold', key: 'title' }, 'Solution'),
+          React.createElement('div', { className: 'font-bold', key: 'title' }, 'Lösung'),
           React.createElement('div', { className: 'text-sm', key: 'desc' }, state.solution.solution_description)
         ])
       },
@@ -48,7 +48,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       id: approachId,
       data: {
         label: createNodeLabel([
-          React.createElement('div', { className: 'font-bold', key: 'title' }, 'Didactic Approach'),
+          React.createElement('div', { className: 'font-bold', key: 'title' }, 'Didaktischer Ansatz'),
           React.createElement('div', { className: 'text-sm', key: 'desc' }, state.solution.didactic_approach)
         ])
       },
@@ -67,9 +67,9 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       data: {
         label: createNodeLabel([
           React.createElement('div', { className: 'font-bold', key: 'title' }, sequence.sequence_name || sequence.sequence_id),
-          React.createElement('div', { className: 'text-sm', key: 'time' }, `Time: ${sequence.time_frame}`),
-          React.createElement('div', { className: 'text-sm', key: 'goal' }, `Goal: ${sequence.learning_goal}`),
-          React.createElement('div', { className: 'text-sm', key: 'transition' }, `Transition: ${sequence.transition_type}`)
+          React.createElement('div', { className: 'text-sm', key: 'time' }, `Zeit: ${sequence.time_frame}`),
+          React.createElement('div', { className: 'text-sm', key: 'goal' }, `Ziel: ${sequence.learning_goal}`),
+          React.createElement('div', { className: 'text-sm', key: 'transition' }, `Übergang: ${sequence.transition_type}`)
         ])
       },
       position: { x: 0, y: 0 },
@@ -84,7 +84,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         source: 'solution',
         target: sequenceId,
         style: { strokeDasharray: '5,5' },
-        label: 'contains'
+        label: 'enthält'
       });
     }
     if (state.solution?.didactic_approach) {
@@ -93,7 +93,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         source: 'didactic_approach',
         target: sequenceId,
         style: { strokeDasharray: '5,5' },
-        label: 'implements'
+        label: 'implementiert'
       });
     }
 
@@ -106,8 +106,8 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         data: {
           label: createNodeLabel([
             React.createElement('div', { className: 'font-bold', key: 'title' }, phase.phase_name || phase.phase_id),
-            React.createElement('div', { className: 'text-sm', key: 'time' }, `Time: ${phase.time_frame}`),
-            React.createElement('div', { className: 'text-sm', key: 'goal' }, `Goal: ${phase.learning_goal}`)
+            React.createElement('div', { className: 'text-sm', key: 'time' }, `Zeit: ${phase.time_frame}`),
+            React.createElement('div', { className: 'text-sm', key: 'goal' }, `Ziel: ${phase.learning_goal}`)
           ])
         },
         position: { x: 0, y: 0 },
@@ -126,7 +126,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         source: sequenceId,
         target: phaseId,
         style: { strokeDasharray: '5,5' },
-        label: 'contains'
+        label: 'enthält'
       });
 
       // Add sequence flow between phases
@@ -138,7 +138,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           target: phaseId,
           animated: true,
           style: { stroke: '#FF8C00' },
-          label: `Step ${phaseIndex + 1}`,
+          label: `Schritt ${phaseIndex + 1}`,
           labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
         });
       }
@@ -152,11 +152,11 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           data: {
             label: createNodeLabel([
               React.createElement('div', { className: 'font-bold', key: 'title' }, activity.name || activity.activity_id),
-              React.createElement('div', { className: 'text-sm', key: 'duration' }, `Duration: ${activity.duration} min`),
+              React.createElement('div', { className: 'text-sm', key: 'duration' }, `Dauer: ${activity.duration} min`),
               React.createElement('div', { className: 'text-sm', key: 'desc' }, activity.description),
-              React.createElement('div', { className: 'text-sm', key: 'goal' }, `Goal: ${activity.goal}`),
+              React.createElement('div', { className: 'text-sm', key: 'goal' }, `Ziel: ${activity.goal}`),
               React.createElement('div', { className: 'text-sm', key: 'assessment' }, 
-                `Assessment: ${activity.assessment?.type || 'N/A'}`
+                `Bewertung: ${activity.assessment?.type === 'formative' ? 'Formativ' : 'Summativ'}`
               )
             ])
           },
@@ -176,7 +176,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           source: phaseId,
           target: activityId,
           style: { strokeDasharray: '5,5' },
-          label: 'contains'
+          label: 'enthält'
         });
 
         // Add sequence flow between activities
@@ -188,14 +188,14 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
             target: activityId,
             animated: true,
             style: { stroke: '#FF8C00' },
-            label: `Step ${activityIndex + 1}`,
+            label: `Schritt ${activityIndex + 1}`,
             labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
           });
         }
 
         // Process roles within activity
-        const roles = activity.roles || [];
-        roles.forEach((role, roleIndex) => {
+        const activityRoles = activity.roles || [];
+        activityRoles.forEach((role, roleIndex) => {
           const roleId = `role-${activity.activity_id}-${role.role_name}`;
           const actor = state.actors.find(a => a.id === role.actor_id);
           const environment = state.environments.find(env => 
@@ -219,14 +219,14 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
 
           const roleElements = [
             React.createElement('div', { className: 'font-bold', key: 'title' }, 
-              `${actor?.name || 'Unknown Actor'} (als ${role.role_name})`
+              `${actor?.name || 'Unbekannter Akteur'} (als ${role.role_name})`
             )
           ];
 
           if (role.task_description) {
             roleElements.push(
               React.createElement('div', { className: 'text-sm', key: 'task' }, 
-                `Task: ${role.task_description}`
+                `Aufgabe: ${role.task_description}`
               )
             );
           }
@@ -234,7 +234,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           if (environment) {
             roleElements.push(
               React.createElement('div', { className: 'text-sm', key: 'env' }, 
-                `Environment: ${environment.name}`
+                `Lernumgebung: ${environment.name}`
               )
             );
           }
@@ -242,7 +242,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           if (selectedMaterials.length > 0) {
             roleElements.push(
               React.createElement('div', { className: 'text-sm', key: 'materials' }, 
-                `Materials: ${selectedMaterials.join(', ')}`
+                `Lernressourcen: ${selectedMaterials.join(', ')}`
               )
             );
           }
@@ -250,7 +250,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           if (selectedTools.length > 0) {
             roleElements.push(
               React.createElement('div', { className: 'text-sm', key: 'tools' }, 
-                `Tools: ${selectedTools.join(', ')}`
+                `Werkzeuge: ${selectedTools.join(', ')}`
               )
             );
           }
@@ -258,7 +258,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           if (selectedServices.length > 0) {
             roleElements.push(
               React.createElement('div', { className: 'text-sm', key: 'services' }, 
-                `Services: ${selectedServices.join(', ')}`
+                `Dienste: ${selectedServices.join(', ')}`
               )
             );
           }
@@ -285,12 +285,12 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
             source: activityId,
             target: roleId,
             style: { strokeDasharray: '5,5' },
-            label: 'performs'
+            label: 'führt aus'
           });
 
           // Add parallel execution edges between roles in the same activity
           if (roleIndex > 0) {
-            const prevRoleId = `role-${activity.activity_id}-${roles[roleIndex - 1].role_name}`;
+            const prevRoleId = `role-${activity.activity_id}-${activityRoles[roleIndex - 1].role_name}`;
             edges.push({
               id: `parallel-${prevRoleId}-${roleId}`,
               source: prevRoleId,
@@ -315,7 +315,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         target: `sequence-${sequence.sequence_id}`,
         animated: true,
         style: { stroke: '#FF8C00' },
-        label: `Sequence ${index + 1}`,
+        label: `Sequenz ${index + 1}`,
         labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
       });
     }

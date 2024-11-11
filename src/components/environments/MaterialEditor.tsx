@@ -3,40 +3,41 @@ import type { Material } from '../../store/templateStore';
 import { FilterEditor } from './FilterEditor';
 
 interface MaterialEditorProps {
-  material: Material & { isNew?: boolean };
+  material: Material;
   onUpdate: (updates: Partial<Material>) => void;
   onDelete: () => void;
-  isEditing?: boolean;
 }
 
-export function MaterialEditor({ material, onUpdate, onDelete, isEditing: initialEditing = false }: MaterialEditorProps) {
-  const [isEditing, setIsEditing] = useState(initialEditing);
-
-  const handleUpdate = (updates: Partial<Material>) => {
-    onUpdate({ ...material, ...updates });
-  };
+export function MaterialEditor({ material, onUpdate, onDelete }: MaterialEditorProps) {
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!isEditing) {
     return (
       <div className="border rounded-lg p-4 mb-4 bg-white">
         <div className="flex justify-between items-start">
           <div>
-            <h4 className="font-semibold">{material.name || 'Unnamed Material'}</h4>
+            <h4 className="font-semibold">{material.name || 'Unbenannte Lernressource'}</h4>
             <p className="text-sm text-gray-600">{material.material_type}</p>
-            <p className="text-sm text-gray-500">Source: {material.source}</p>
+            <p className="text-sm text-gray-500">Quelle: {material.source}</p>
+            {material.access_link && (
+              <p className="text-sm text-gray-500">Link: {material.access_link}</p>
+            )}
+            {material.source === 'database' && material.database_id && (
+              <p className="text-sm text-gray-500">Datenbank-ID: {material.database_id}</p>
+            )}
           </div>
           <div className="space-x-2">
             <button
               onClick={() => setIsEditing(true)}
               className="px-3 py-1 text-sm bg-blue-100 rounded hover:bg-blue-200"
             >
-              Edit
+              Bearbeiten
             </button>
             <button
               onClick={onDelete}
               className="px-3 py-1 text-sm bg-red-100 rounded hover:bg-red-200"
             >
-              Delete
+              Löschen
             </button>
           </div>
         </div>
@@ -51,52 +52,63 @@ export function MaterialEditor({ material, onUpdate, onDelete, isEditing: initia
         <input
           type="text"
           value={material.name}
-          onChange={(e) => handleUpdate({ name: e.target.value })}
+          onChange={(e) => onUpdate({ name: e.target.value })}
           className="w-full p-2 border rounded"
           autoFocus
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Type</label>
-        <input
-          type="text"
+        <label className="block text-sm font-medium mb-1">Ressourcentyp</label>
+        <select
           value={material.material_type}
-          onChange={(e) => handleUpdate({ material_type: e.target.value })}
+          onChange={(e) => onUpdate({ material_type: e.target.value })}
           className="w-full p-2 border rounded"
-        />
+        >
+          <option value="">Bitte wählen...</option>
+          <option value="Lernvideo">Lernvideo</option>
+          <option value="Arbeitsblatt">Arbeitsblatt</option>
+          <option value="Dokument">Dokument</option>
+          <option value="Wissenstest">Wissenstest</option>
+          <option value="Präsentation">Präsentation</option>
+          <option value="Übung">Übung</option>
+          <option value="Tutorial">Tutorial</option>
+          <option value="Simulation">Simulation</option>
+          <option value="Infografik">Infografik</option>
+          <option value="Audio">Audio</option>
+        </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Access Link</label>
+        <label className="block text-sm font-medium mb-1">Zugangslink</label>
         <input
           type="text"
           value={material.access_link}
-          onChange={(e) => handleUpdate({ access_link: e.target.value })}
+          onChange={(e) => onUpdate({ access_link: e.target.value })}
           className="w-full p-2 border rounded"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Source</label>
+        <label className="block text-sm font-medium mb-1">Quelle</label>
         <select
           value={material.source}
-          onChange={(e) => handleUpdate({ source: e.target.value as Material['source'] })}
+          onChange={(e) => onUpdate({ source: e.target.value as Material['source'] })}
           className="w-full p-2 border rounded"
         >
-          <option value="manual">Manual</option>
-          <option value="database">Database</option>
+          <option value="manual">Manuell</option>
+          <option value="database">Datenbank</option>
           <option value="filter">Filter</option>
         </select>
       </div>
 
       {material.source === 'database' && (
         <div>
-          <label className="block text-sm font-medium mb-1">Database ID</label>
+          <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
           <input
             type="text"
             value={material.database_id || ''}
-            onChange={(e) => handleUpdate({ database_id: e.target.value })}
+            onChange={(e) => onUpdate({ database_id: e.target.value })}
             className="w-full p-2 border rounded"
           />
         </div>
@@ -104,10 +116,10 @@ export function MaterialEditor({ material, onUpdate, onDelete, isEditing: initia
 
       {material.source === 'filter' && (
         <div>
-          <label className="block text-sm font-medium mb-1">Filter Criteria</label>
+          <label className="block text-sm font-medium mb-1">Filterkriterien</label>
           <FilterEditor
             filter={material.filter_criteria || {}}
-            onChange={(filter) => handleUpdate({ filter_criteria: filter })}
+            onChange={(filter) => onUpdate({ filter_criteria: filter })}
           />
         </div>
       )}
@@ -117,13 +129,13 @@ export function MaterialEditor({ material, onUpdate, onDelete, isEditing: initia
           onClick={() => setIsEditing(false)}
           className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
         >
-          Cancel
+          Abbrechen
         </button>
         <button
           onClick={() => setIsEditing(false)}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Save
+          Speichern
         </button>
       </div>
     </div>
