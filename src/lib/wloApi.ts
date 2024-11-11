@@ -22,7 +22,7 @@ export type WLOSearchParams = {
   maxItems?: number;
   skipCount?: number;
   propertyFilter?: string;
-  endpoint?: string;
+  endpoint: string;
   combineMode?: 'OR' | 'AND';
 };
 
@@ -66,12 +66,12 @@ export async function searchWLO({
       endpoint
     });
 
-    // Direkter Aufruf der edu-sharing API mit CORS-Headers
+    // Direct request to WLO API
     const response = await fetch(`${endpoint}/search/v1/custom/-home-?${params.toString()}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Cache-Control': 'no-cache'
+        'Access-Control-Allow-Origin': '*'
       },
       signal: controller.signal,
       mode: 'cors'
@@ -80,26 +80,7 @@ export async function searchWLO({
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorDetails = {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url
-      };
-      console.error('WLO API Error:', errorDetails);
-
-      let errorBody;
-      try {
-        errorBody = await response.text();
-        console.error('Error response body:', errorBody);
-      } catch (e) {
-        console.error('Could not read error response body:', e);
-      }
-
-      throw new Error(
-        `HTTP error! status: ${response.status} - ${response.statusText}\n` +
-        `URL: ${response.url}\n` +
-        (errorBody ? `Response: ${errorBody}` : '')
-      );
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -129,12 +110,6 @@ export async function searchWLO({
     };
   } catch (error) {
     console.error('Error searching WLO:', error);
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 60 seconds');
-      }
-      throw error;
-    }
-    throw new Error('Unknown error occurred while searching WLO');
+    throw error;
   }
 }
