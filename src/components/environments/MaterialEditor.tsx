@@ -6,10 +6,12 @@ interface MaterialEditorProps {
   material: Material;
   onUpdate: (updates: Partial<Material>) => void;
   onDelete: () => void;
+  isNew?: boolean;
+  contentTypes: string[];
 }
 
-export function MaterialEditor({ material, onUpdate, onDelete }: MaterialEditorProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function MaterialEditor({ material, onUpdate, onDelete, isNew = false, contentTypes }: MaterialEditorProps) {
+  const [isEditing, setIsEditing] = useState(isNew);
 
   if (!isEditing) {
     return (
@@ -66,16 +68,9 @@ export function MaterialEditor({ material, onUpdate, onDelete }: MaterialEditorP
           className="w-full p-2 border rounded"
         >
           <option value="">Bitte wählen...</option>
-          <option value="Lernvideo">Lernvideo</option>
-          <option value="Arbeitsblatt">Arbeitsblatt</option>
-          <option value="Dokument">Dokument</option>
-          <option value="Wissenstest">Wissenstest</option>
-          <option value="Präsentation">Präsentation</option>
-          <option value="Übung">Übung</option>
-          <option value="Tutorial">Tutorial</option>
-          <option value="Simulation">Simulation</option>
-          <option value="Infografik">Infografik</option>
-          <option value="Audio">Audio</option>
+          {contentTypes.map(type => (
+            <option key={type} value={type}>{type}</option>
+          ))}
         </select>
       </div>
 
@@ -102,31 +97,34 @@ export function MaterialEditor({ material, onUpdate, onDelete }: MaterialEditorP
         </select>
       </div>
 
-      {material.source === 'database' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
-          <input
-            type="text"
-            value={material.database_id || ''}
-            onChange={(e) => onUpdate({ database_id: e.target.value })}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
+        <input
+          type="text"
+          value={material.database_id || ''}
+          onChange={(e) => onUpdate({ database_id: e.target.value })}
+          className="w-full p-2 border rounded"
+          disabled={material.source !== 'database'}
+        />
+      </div>
 
-      {material.source === 'filter' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Filterkriterien</label>
-          <FilterEditor
-            filter={material.filter_criteria || {}}
-            onChange={(filter) => onUpdate({ filter_criteria: filter })}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Filterkriterien</label>
+        <FilterEditor
+          filter={material.filter_criteria || {}}
+          onChange={(filter) => onUpdate({ filter_criteria: filter })}
+        />
+      </div>
 
       <div className="flex justify-end space-x-2">
         <button
-          onClick={() => setIsEditing(false)}
+          onClick={() => {
+            if (isNew) {
+              onDelete();
+            } else {
+              setIsEditing(false);
+            }
+          }}
           className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
         >
           Abbrechen

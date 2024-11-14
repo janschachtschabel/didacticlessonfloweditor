@@ -1,7 +1,16 @@
 import { useTemplateStore } from '../store/templateStore';
+import { SaveLoad } from '../components/SaveLoad';
+
+const defaultMetadata = {
+  title: '',
+  description: '',
+  keywords: [],
+  author: '',
+  version: '1.0'
+};
 
 export function GeneralSettings() {
-  const { metadata, setMetadata } = useTemplateStore();
+  const { metadata = defaultMetadata, setMetadata } = useTemplateStore();
 
   const handleKeywordsChange = (value: string) => {
     setMetadata({
@@ -12,7 +21,10 @@ export function GeneralSettings() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Allgemeine Einstellungen</h1>
+      <div className="flex justify-between items-start">
+        <h1 className="text-2xl font-bold">Allgemeine Einstellungen</h1>
+        <SaveLoad />
+      </div>
       
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="space-y-4">
@@ -20,7 +32,7 @@ export function GeneralSettings() {
             <label className="block text-sm font-medium text-gray-700">Titel</label>
             <input
               type="text"
-              value={metadata.title || ''}
+              value={metadata.title}
               onChange={(e) => setMetadata({ ...metadata, title: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
@@ -29,7 +41,7 @@ export function GeneralSettings() {
           <div>
             <label className="block text-sm font-medium text-gray-700">Beschreibung</label>
             <textarea
-              value={metadata.description || ''}
+              value={metadata.description}
               onChange={(e) => setMetadata({ ...metadata, description: e.target.value })}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -40,7 +52,7 @@ export function GeneralSettings() {
             <label className="block text-sm font-medium text-gray-700">Schlüsselwörter (durch Komma getrennt)</label>
             <input
               type="text"
-              value={(metadata.keywords || []).join(', ')}
+              value={metadata.keywords.join(', ')}
               onChange={(e) => handleKeywordsChange(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
@@ -50,7 +62,7 @@ export function GeneralSettings() {
             <label className="block text-sm font-medium text-gray-700">Autor</label>
             <input
               type="text"
-              value={metadata.author || ''}
+              value={metadata.author}
               onChange={(e) => setMetadata({ ...metadata, author: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
@@ -60,7 +72,7 @@ export function GeneralSettings() {
             <label className="block text-sm font-medium text-gray-700">Version</label>
             <input
               type="text"
-              value={metadata.version || '1.0'}
+              value={metadata.version}
               onChange={(e) => setMetadata({ ...metadata, version: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />

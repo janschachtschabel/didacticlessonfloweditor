@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
 import { processTemplate } from '../lib/api';
+import { SaveLoad } from '../components/SaveLoad';
 
 const AI_MODELS = [
   { id: 'gpt-4o-mini', name: 'GPT-4O Mini' },
@@ -76,7 +77,10 @@ export function AIFlowAgent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">KI Ablauf</h1>
+      <div className="flex justify-between items-start">
+        <h1 className="text-2xl font-bold">KI Ablauf</h1>
+        <SaveLoad />
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

@@ -53,10 +53,10 @@ export function FilterEditor({ filter, onChange }: FilterEditorProps) {
       </button>
 
       <div className="space-y-2">
-        {Object.entries(filter).map(([key, value]) => (
+        {Object.entries(filter).map(([key]) => (
           <div key={key} className="flex justify-between items-center p-2 bg-gray-50 rounded">
             <div>
-              <span className="font-medium">{key}:</span> {value}
+              <span className="font-medium">{key}:</span> {filter[key]}
             </div>
             <button
               onClick={() => handleRemoveCriteria(key)}

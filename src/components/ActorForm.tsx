@@ -10,6 +10,10 @@ interface ActorFormProps {
 
 export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newLanguage, setNewLanguage] = useState('');
+  const [newProficiencyLevel, setNewProficiencyLevel] = useState('A1');
+
+  const proficiencyLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
   const validateField = (name: string, value: any): string => {
     switch (name) {
@@ -55,6 +59,62 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
     } else {
       onUpdate({ [field]: value });
     }
+  };
+
+  const handleAddLanguage = () => {
+    if (!newLanguage) return;
+
+    const currentLanguages = [...actor.competencies.language_skills.languages];
+    const currentProficiencyLevels = { ...actor.competencies.language_skills.proficiency_levels };
+
+    if (!currentLanguages.includes(newLanguage)) {
+      currentLanguages.push(newLanguage);
+      currentProficiencyLevels[newLanguage] = newProficiencyLevel;
+
+      onUpdate({
+        competencies: {
+          ...actor.competencies,
+          language_skills: {
+            languages: currentLanguages,
+            proficiency_levels: currentProficiencyLevels
+          }
+        }
+      });
+    }
+
+    setNewLanguage('');
+    setNewProficiencyLevel('A1');
+  };
+
+  const handleRemoveLanguage = (language: string) => {
+    const currentLanguages = actor.competencies.language_skills.languages.filter(l => l !== language);
+    const currentProficiencyLevels = { ...actor.competencies.language_skills.proficiency_levels };
+    delete currentProficiencyLevels[language];
+
+    onUpdate({
+      competencies: {
+        ...actor.competencies,
+        language_skills: {
+          languages: currentLanguages,
+          proficiency_levels: currentProficiencyLevels
+        }
+      }
+    });
+  };
+
+  const handleUpdateProficiencyLevel = (language: string, level: string) => {
+    onUpdate({
+      competencies: {
+        ...actor.competencies,
+        language_skills: {
+          ...actor.competencies.language_skills,
+          proficiency_levels: {
+            ...actor.competencies.language_skills.proficiency_levels,
+            [language]: level
+          }
+        }
+      }
+    });
   };
 
   return (
@@ -238,14 +298,54 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
           
           {/* Sprachkenntnisse */}
           <div>
-            <label className="block text-sm font-medium mb-1">Sprachen</label>
-            <input
-              type="text"
-              value={actor.competencies.language_skills.languages.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'languages', 'language_skills')}
-              className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste der Sprachen"
-            />
+            <label className="block text-sm font-medium mb-1">Sprachkenntnisse</label>
+            <div className="space-y-2">
+              {actor.competencies.language_skills.languages.map(language => (
+                <div key={language} className="flex items-center gap-2">
+                  <span className="min-w-[120px]">{language}</span>
+                  <select
+                    value={actor.competencies.language_skills.proficiency_levels[language] || 'A1'}
+                    onChange={(e) => handleUpdateProficiencyLevel(language, e.target.value)}
+                    className="w-24 p-2 border rounded"
+                  >
+                    {proficiencyLevels.map(level => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleRemoveLanguage(language)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              
+              <div className="flex gap-2 mt-2">
+                <input
+                  type="text"
+                  value={newLanguage}
+                  onChange={(e) => setNewLanguage(e.target.value)}
+                  placeholder="Neue Sprache"
+                  className="flex-1 p-2 border rounded"
+                />
+                <select
+                  value={newProficiencyLevel}
+                  onChange={(e) => setNewProficiencyLevel(e.target.value)}
+                  className="w-24 p-2 border rounded"
+                >
+                  {proficiencyLevels.map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleAddLanguage}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Hinzufügen
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -329,6 +429,7 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
               >
                 <option value="intrinsic">Intrinsisch</option>
                 <option value="extrinsic">Extrinsisch</option>
+                <option value="mixed">Gemischt</option>
               </select>
             </div>
             <div>

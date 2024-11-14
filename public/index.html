@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Processor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Template Processor</h1>
+        
+        <div class="editor-section">
+            <h2>Template Editor</h2>
+            <div class="editor-container">
+                <textarea id="templateEditor" placeholder="Enter your template here..."></textarea>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <label for="apiKey">OpenAI API Key:</label>
+                <input type="password" id="apiKey" placeholder="Enter your API key">
+            </div>
+            
+            <div class="input-group">
+                <label for="userInput">Instructions:</label>
+                <textarea id="userInput" placeholder="Enter instructions for modifying the template..."></textarea>
+            </div>
+
+            <button id="processButton" onclick="processTemplate()">Process Template</button>
+        </div>
+
+        <div class="result-section">
+            <h2>Results</h2>
+            <div id="status" class="status-box">Ready to process</div>
+            <div id="output" class="output-container"></div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>

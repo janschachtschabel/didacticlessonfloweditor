@@ -7,6 +7,7 @@ interface RoleEditorProps {
   environments: LearningEnvironment[];
   onUpdate: (updates: Partial<Role>) => void;
   onDelete: () => void;
+  activityId: string;
 }
 
 export function RoleEditor({
@@ -14,7 +15,8 @@ export function RoleEditor({
   actors,
   environments,
   onUpdate,
-  onDelete
+  onDelete,
+  activityId
 }: RoleEditorProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 

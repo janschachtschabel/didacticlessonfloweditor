@@ -5,10 +5,10 @@ import {
   UsersIcon,
   BuildingLibraryIcon,
   AcademicCapIcon,
-  EyeIcon,
   BoltIcon,
   FunnelIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
@@ -40,7 +40,7 @@ const navItems = [
   { 
     path: '/preview', 
     label: 'Vorschau',
-    icon: EyeIcon
+    icon: ChartBarIcon
   },
   { 
     path: '/ai-flow-agent', 

@@ -14,7 +14,65 @@ export async function processTemplate(
   });
 
   const prompt = `
-Als didaktischer Assistent helfen Sie bei der Vervollständigung oder Anpassung dieses Templates.
+Als didaktischer Assistent helfen Sie bei der Vervollständigung oder Anpassung dieses Templates. Bitte stellen Sie sicher, dass ALLE folgenden Elemente vollständig und sinnvoll ausgefüllt werden:
+
+1. Allgemeine Metadaten:
+   - Titel
+   - Beschreibung
+   - Schlüsselwörter
+   - Autor
+   - Version
+
+2. Patternelemente:
+   - Problem mit Beschreibung, Lernzielen und didaktischen Schlüsselwörtern
+   - Kontext (Zielgruppe, Fach, Bildungsstufe, Voraussetzungen, Zeitrahmen)
+   - Einflussfaktoren als Kräfte zwischen Problem und Lösung
+   - Lösung mit Beschreibung und didaktischem Ansatz (als "Adjektiv + Lernen")
+   - Konsequenzen (Vor- und Nachteile)
+   - Umsetzungshinweise
+   - Verwandte Muster
+   - Feedback
+   - Quellen
+
+3. Sequenzierungsoptionen:
+   Für Lernsequenzen:
+   - Sequenziell: Feste Reihenfolge
+   - Parallel: Gleichzeitige Durchführung
+   - Bedingt: Übergang mit Bedingungen
+   - Alle abgeschlossen: Warten auf Abschluss aller
+   - Eine von: Auswahl einer Option
+
+   Für Phasen:
+   - Sequenziell: Feste Reihenfolge
+
+   Für Aktivitäten:
+   - Sequenziell: Feste Reihenfolge
+   - Parallel: Gleichzeitige Durchführung
+   - Bedingt: Übergang mit Bedingungen
+   - Branching: Pfadauswahl
+   - Looping: Wiederholung
+   - Optional: Freiwillige Aktivität
+   - Feedback Loops: Rückkehr basierend auf Feedback
+
+   Für Rollen:
+   - Parallel: Immer gleichzeitige Durchführung
+
+4. Integration von Lernumgebungen und Akteuren:
+   - Jede Rolle braucht actor_id und learning_environment
+   - Wählen Sie passende Ressourcen (selected_materials, selected_tools, selected_services)
+   - Berücksichtigen Sie Sprachniveau und Bedürfnisse der Akteure
+
+5. Assessment:
+   - Formativ (laufend) oder summativ (abschließend)
+   - Bewertungsmethoden
+   - Erfolgskriterien
+
+WICHTIG:
+- Eine Lernsequenz = eine Unterrichtseinheit
+- Sinnvolles Assessment-Konzept integrieren
+- Passende Lernziele einbauen
+- Alle Rollen aktiv gestalten
+- Ressourcen effektiv nutzen
 
 Aktuelles Template:
 ${JSON.stringify(template, null, 2)}
@@ -22,61 +80,10 @@ ${JSON.stringify(template, null, 2)}
 Beispielvorlage als Referenz:
 ${JSON.stringify(exampleTemplate, null, 2)}
 
-Wichtige Hinweise zur Erstellung:
-
-1. Didaktische Struktur:
-   - Klare Problembeschreibung
-   - Spezifische Lernziele
-   - Relevante didaktische Schlüsselwörter
-
-2. Kontext:
-   - Zielgruppendefinition
-   - Fachbereich
-   - Bildungsstufe
-   - Voraussetzungen
-   - Zeitrahmen
-
-3. Sequenzierungsoptionen:
-   - Sequenziell: Feste Reihenfolge der Elemente
-   - Parallel: Gleichzeitige Aktivitäten
-   - Bedingt: Übergänge basieren auf Bedingungen
-   - Verzweigung: Auswahl zwischen verschiedenen Pfaden
-   - Wiederholung: Aktivitätswiederholung basierend auf Feedback
-   - Optional: Freiwillige Aktivitätsauswahl
-
-4. Lernumgebung:
-   - Physischer/virtueller Raum
-   - Lernressourcen (Lerninhalte wie Videos, Arbeitsblätter, Tests etc.)
-   - Werkzeuge und Hilfsmittel
-   - Unterstützende Dienste
-
-5. Akteure und Rollen:
-   - Klare Verantwortlichkeiten
-   - Erforderliche Kompetenzen
-   - Interaktionsmuster
-   - Unterstützungsbedarf
-
-6. Bewertungsintegration:
-   - Formative/summative Methoden
-   - Erfolgskriterien
-   - Feedbackmechanismen
-   - Fortschrittsverfolgung
-
-7. Umsetzungsaspekte:
-   - Ressourcenbedarf
-   - Vorbereitungsbedarf
-   - Potenzielle Herausforderungen
-   - Anpassungsoptionen
-
-8. Begrifflichkeiten:
-   - "Lernressourcen" oder "Lerninhalte" statt "Materialien"
-   - Beispiele für Lernressourcen: Lernvideos, Arbeitsblätter, Dokumente, Wissenstests, 
-     Präsentationen, Übungen, Tutorials, Simulationen, Infografiken, Audiodateien
-
 Anweisungen des Nutzers:
 ${input}
 
-Bitte geben Sie das angepasste Template als JSON-Objekt zurück.
+Bitte geben Sie das vervollständigte Template als JSON-Objekt zurück.
 `;
 
   const response = await client.chat.completions.create({
@@ -84,14 +91,14 @@ Bitte geben Sie das angepasste Template als JSON-Objekt zurück.
     messages: [
       {
         role: 'system',
-        content: 'Sie sind ein hilfreicher didaktischer Assistent.'
+        content: 'Sie sind ein erfahrener didaktischer Assistent, der vielfältige und flexible Lernszenarien mit allen erforderlichen Details erstellt.'
       },
       {
         role: 'user',
         content: prompt
       }
     ],
-    temperature: 0.7,
+    temperature: 0.8,
     response_format: { type: 'json_object' }
   });
 

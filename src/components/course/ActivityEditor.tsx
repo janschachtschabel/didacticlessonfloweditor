@@ -8,6 +8,8 @@ interface ActivityEditorProps {
   environments: LearningEnvironment[];
   onUpdate: (updates: Partial<Activity>) => void;
   onDelete: () => void;
+  availableActivities: Activity[];
+  phaseId: string;
 }
 
 const defaultAssessment: Assessment = {
@@ -18,15 +20,21 @@ const defaultAssessment: Assessment = {
 
 export function ActivityEditor({ 
   activity, 
-  actors, 
-  environments,
+  actors = [], 
+  environments = [],
   onUpdate, 
-  onDelete 
+  onDelete,
+  availableActivities,
+  phaseId
 }: ActivityEditorProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleAddRole = () => {
+    const roleNumber = (activity.roles?.length || 0) + 1;
+    const roleId = `${activity.activity_id}-R${roleNumber}`;
+    
     const newRole = {
+      role_id: roleId,
       role_name: '',
       actor_id: '',
       task_description: '',
@@ -66,8 +74,54 @@ export function ActivityEditor({
 
   const assessment = activity.assessment || defaultAssessment;
 
+  // Get selected resources for display
+  const getSelectedResources = () => {
+    const resources: {
+      materials: { name: string; env: string }[];
+      tools: { name: string; env: string }[];
+      services: { name: string; env: string }[];
+    } = {
+      materials: [],
+      tools: [],
+      services: []
+    };
+
+    (activity.roles || []).forEach(role => {
+      const env = environments.find(e => e.id === role.learning_environment?.environment_id);
+      if (env) {
+        // Materials
+        (role.learning_environment?.selected_materials || []).forEach(matId => {
+          const material = (env.materials || []).find(m => m.id === matId);
+          if (material) {
+            resources.materials.push({ name: material.name, env: env.name });
+          }
+        });
+
+        // Tools
+        (role.learning_environment?.selected_tools || []).forEach(toolId => {
+          const tool = (env.tools || []).find(t => t.id === toolId);
+          if (tool) {
+            resources.tools.push({ name: tool.name, env: env.name });
+          }
+        });
+
+        // Services
+        (role.learning_environment?.selected_services || []).forEach(serviceId => {
+          const service = (env.services || []).find(s => s.id === serviceId);
+          if (service) {
+            resources.services.push({ name: service.name, env: env.name });
+          }
+        });
+      }
+    });
+
+    return resources;
+  };
+
+  const selectedResources = getSelectedResources();
+
   return (
-    <div className="border-l-2 border-green-500 pl-4 mb-4">
+    <div className="border-l-2 border-yellow-500 pl-4 mb-4">
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="flex justify-between items-start mb-4">
           <button
@@ -131,32 +185,57 @@ export function ActivityEditor({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Voraussetzende Aktivität</label>
-                <input
-                  type="text"
-                  value={activity.prerequisite_activity || ''}
-                  onChange={(e) => onUpdate({ prerequisite_activity: e.target.value || null })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Übergangstyp</label>
-                <select
-                  value={activity.transition_type}
-                  onChange={(e) => onUpdate({ transition_type: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="sequential">Sequenziell</option>
-                  <option value="parallel">Parallel</option>
-                  <option value="conditional">Bedingt</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Voraussetzende Aktivität</label>
+              <select
+                value={activity.prerequisite_activity || ''}
+                onChange={(e) => onUpdate({ prerequisite_activity: e.target.value || null })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">Keine</option>
+                {availableActivities.map(act => (
+                  <option key={act.activity_id} value={act.activity_id}>
+                    {act.name || act.activity_id}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {activity.transition_type === 'conditional' && (
+            {activity.next_activity?.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Nächste Aktivitäten</label>
+                <div className="mt-1 text-sm text-gray-500">
+                  {activity.next_activity.map(nextId => {
+                    const nextAct = availableActivities.find(a => a.activity_id === nextId);
+                    return nextAct ? (nextAct.name || nextAct.activity_id) : nextId;
+                  }).join(', ')}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Übergangstyp</label>
+              <select
+                value={activity.transition_type}
+                onChange={(e) => onUpdate({ 
+                  transition_type: e.target.value as Activity['transition_type']
+                })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="sequential">Sequenziell</option>
+                <option value="parallel">Parallel</option>
+                <option value="conditional">Bedingt</option>
+                <option value="branching">Verzweigung</option>
+                <option value="looping">Wiederholung</option>
+                <option value="optional">Optional</option>
+                <option value="feedback_loops">Feedback-Schleife</option>
+              </select>
+            </div>
+
+            {(activity.transition_type === 'conditional' || 
+              activity.transition_type === 'branching' || 
+              activity.transition_type === 'looping' || 
+              activity.transition_type === 'feedback_loops') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">Bedingungsbeschreibung</label>
                 <textarea
@@ -164,9 +243,80 @@ export function ActivityEditor({
                   onChange={(e) => onUpdate({ condition_description: e.target.value || null })}
                   rows={2}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={
+                    activity.transition_type === 'conditional' ? 'Beschreiben Sie die Bedingung für den Übergang...' :
+                    activity.transition_type === 'branching' ? 'Beschreiben Sie die Verzweigungskriterien...' :
+                    activity.transition_type === 'looping' ? 'Beschreiben Sie die Wiederholungsbedingung...' :
+                    'Beschreiben Sie die Feedback-Bedingung...'
+                  }
                 />
               </div>
             )}
+
+            {activity.transition_type === 'looping' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Wiederholungsbedingung</label>
+                <input
+                  type="text"
+                  value={activity.repeat_until || ''}
+                  onChange={(e) => onUpdate({ repeat_until: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="z.B. Mindestens 80% korrekte Antworten"
+                />
+              </div>
+            )}
+
+            {activity.transition_type === 'optional' && (
+              <div className="flex items-center mt-2">
+                <input
+                  type="checkbox"
+                  checked={activity.is_optional || false}
+                  onChange={(e) => onUpdate({ is_optional: e.target.checked })}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label className="ml-2 text-sm text-gray-700">
+                  Diese Aktivität ist optional
+                </label>
+              </div>
+            )}
+
+            {/* Selected Resources Overview */}
+            <div className="border-t pt-4">
+              <h4 className="text-lg font-medium mb-4">Ausgewählte Ressourcen</h4>
+              
+              {selectedResources.materials.length > 0 && (
+                <div className="mb-3">
+                  <h5 className="text-sm font-medium text-gray-700">Lernressourcen:</h5>
+                  <ul className="list-disc list-inside text-sm text-gray-600 ml-2">
+                    {selectedResources.materials.map((mat, idx) => (
+                      <li key={idx}>{mat.name} ({mat.env})</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedResources.tools.length > 0 && (
+                <div className="mb-3">
+                  <h5 className="text-sm font-medium text-gray-700">Werkzeuge:</h5>
+                  <ul className="list-disc list-inside text-sm text-gray-600 ml-2">
+                    {selectedResources.tools.map((tool, idx) => (
+                      <li key={idx}>{tool.name} ({tool.env})</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedResources.services.length > 0 && (
+                <div className="mb-3">
+                  <h5 className="text-sm font-medium text-gray-700">Dienste:</h5>
+                  <ul className="list-disc list-inside text-sm text-gray-600 ml-2">
+                    {selectedResources.services.map((service, idx) => (
+                      <li key={idx}>{service.name} ({service.env})</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
 
             <div className="border-t pt-4">
               <h4 className="text-lg font-medium mb-4">Bewertung</h4>
@@ -221,14 +371,15 @@ export function ActivityEditor({
               </div>
 
               <div className="space-y-4">
-                {activity.roles?.map((role, index) => (
+                {(activity.roles || []).map((role, index) => (
                   <RoleEditor
-                    key={index}
+                    key={role.role_id}
                     role={role}
                     actors={actors}
                     environments={environments}
                     onUpdate={(updates) => handleUpdateRole(index, updates)}
                     onDelete={() => handleDeleteRole(index)}
+                    activityId={activity.activity_id}
                   />
                 ))}
               </div>

@@ -9,6 +9,7 @@ interface PhaseEditorProps {
   availablePhases: Phase[];
   onUpdate: (updates: Partial<Phase>) => void;
   onDelete: () => void;
+  sequenceId: string;
 }
 
 export function PhaseEditor({
@@ -17,13 +18,17 @@ export function PhaseEditor({
   environments,
   availablePhases,
   onUpdate,
-  onDelete
+  onDelete,
+  sequenceId
 }: PhaseEditorProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleAddActivity = () => {
+    const activityNumber = (phase.activities?.length || 0) + 1;
+    const activityId = `${phase.phase_id}-A${activityNumber}`;
+
     const newActivity = {
-      activity_id: `A${(phase.activities?.length || 0) + 1}`,
+      activity_id: activityId,
       name: '',
       description: '',
       duration: 0,
@@ -194,6 +199,7 @@ export function PhaseEditor({
                     availableActivities={phase.activities.filter((_, idx) => idx !== index)}
                     onUpdate={(updates) => handleUpdateActivity(index, updates)}
                     onDelete={() => handleDeleteActivity(index)}
+                    phaseId={phase.phase_id}
                   />
                 ))}
               </div>

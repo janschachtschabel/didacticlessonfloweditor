@@ -3,33 +3,49 @@ import type { Material, Tool, Service } from '../store/templateStore';
 import { MaterialEditor } from '../components/environments/MaterialEditor';
 import { ToolEditor } from '../components/environments/ToolEditor';
 import { ServiceEditor } from '../components/environments/ServiceEditor';
+import { SaveLoad } from '../components/SaveLoad';
+import { INHALTSTYP_MAPPING } from '../lib/mappings';
+
+const defaultEnvironment = {
+  id: '',
+  name: '',
+  description: '',
+  materials: [],
+  tools: [],
+  services: []
+};
 
 export function LearningEnvironments() {
-  const { environments, addEnvironment, updateEnvironment, removeEnvironment } = useTemplateStore();
+  const { environments = [], addEnvironment, updateEnvironment, removeEnvironment } = useTemplateStore();
+
+  // Get the list of content types from the mapping
+  const contentTypes = Object.keys(INHALTSTYP_MAPPING);
 
   const handleAddEnvironment = () => {
+    const envNumber = environments.length + 1;
+    const envId = `ENV${envNumber}`;
+    
     addEnvironment({
-      id: `env-${Date.now()}`,
-      name: '',
-      description: '',
-      materials: [],
-      tools: [],
-      services: []
+      ...defaultEnvironment,
+      id: envId
     });
   };
 
   const handleAddMaterial = (envId: string) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
+      const materialNumber = (env.materials || []).length + 1;
+      const materialId = `${envId}-M${materialNumber}`;
+      
       const newMaterial: Material = {
-        id: `mat-${Date.now()}`,
+        id: materialId,
         name: '',
         material_type: '',
         source: 'manual',
         access_link: ''
       };
       updateEnvironment(envId, {
-        materials: [...env.materials, newMaterial]
+        materials: [...(env.materials || []), newMaterial]
       });
     }
   };
@@ -37,15 +53,18 @@ export function LearningEnvironments() {
   const handleAddTool = (envId: string) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
+      const toolNumber = (env.tools || []).length + 1;
+      const toolId = `${envId}-T${toolNumber}`;
+      
       const newTool: Tool = {
-        id: `tool-${Date.now()}`,
+        id: toolId,
         name: '',
         tool_type: '',
         source: 'manual',
         access_link: ''
       };
       updateEnvironment(envId, {
-        tools: [...env.tools, newTool]
+        tools: [...(env.tools || []), newTool]
       });
     }
   };
@@ -53,15 +72,18 @@ export function LearningEnvironments() {
   const handleAddService = (envId: string) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
+      const serviceNumber = (env.services || []).length + 1;
+      const serviceId = `${envId}-S${serviceNumber}`;
+      
       const newService: Service = {
-        id: `service-${Date.now()}`,
+        id: serviceId,
         name: '',
         service_type: '',
         source: 'manual',
         access_link: ''
       };
       updateEnvironment(envId, {
-        services: [...env.services, newService]
+        services: [...(env.services || []), newService]
       });
     }
   };
@@ -69,7 +91,7 @@ export function LearningEnvironments() {
   const handleUpdateMaterial = (envId: string, materialId: string, updates: Partial<Material>) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
-      const updatedMaterials = env.materials.map(material =>
+      const updatedMaterials = (env.materials || []).map(material =>
         material.id === materialId ? { ...material, ...updates } : material
       );
       updateEnvironment(envId, { materials: updatedMaterials });
@@ -79,7 +101,7 @@ export function LearningEnvironments() {
   const handleUpdateTool = (envId: string, toolId: string, updates: Partial<Tool>) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
-      const updatedTools = env.tools.map(tool =>
+      const updatedTools = (env.tools || []).map(tool =>
         tool.id === toolId ? { ...tool, ...updates } : tool
       );
       updateEnvironment(envId, { tools: updatedTools });
@@ -89,7 +111,7 @@ export function LearningEnvironments() {
   const handleUpdateService = (envId: string, serviceId: string, updates: Partial<Service>) => {
     const env = environments.find(e => e.id === envId);
     if (env) {
-      const updatedServices = env.services.map(service =>
+      const updatedServices = (env.services || []).map(service =>
         service.id === serviceId ? { ...service, ...updates } : service
       );
       updateEnvironment(envId, { services: updatedServices });
@@ -100,7 +122,7 @@ export function LearningEnvironments() {
     const env = environments.find(e => e.id === envId);
     if (env) {
       updateEnvironment(envId, {
-        materials: env.materials.filter(m => m.id !== materialId)
+        materials: (env.materials || []).filter(m => m.id !== materialId)
       });
     }
   };
@@ -109,7 +131,7 @@ export function LearningEnvironments() {
     const env = environments.find(e => e.id === envId);
     if (env) {
       updateEnvironment(envId, {
-        tools: env.tools.filter(t => t.id !== toolId)
+        tools: (env.tools || []).filter(t => t.id !== toolId)
       });
     }
   };
@@ -118,14 +140,17 @@ export function LearningEnvironments() {
     const env = environments.find(e => e.id === envId);
     if (env) {
       updateEnvironment(envId, {
-        services: env.services.filter(s => s.id !== serviceId)
+        services: (env.services || []).filter(s => s.id !== serviceId)
       });
     }
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Lernumgebungen</h1>
+      <div className="flex justify-between items-start mb-6">
+        <h1 className="text-2xl font-bold">Lernumgebungen</h1>
+        <SaveLoad />
+      </div>
 
       {environments.map((env) => (
         <div key={env.id} className="bg-white p-6 rounded-lg shadow">
@@ -161,59 +186,69 @@ export function LearningEnvironments() {
 
           {/* Lernressourcen */}
           <div className="mt-6">
-            <h3 className="text-lg font-medium mb-2">Lernressourcen</h3>
-            {env.materials.map((material) => (
+            <div className="mb-4">
+              <h3 className="text-lg font-medium mb-2">Lernressourcen</h3>
+              <button
+                onClick={() => handleAddMaterial(env.id)}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Lernressource hinzufügen
+              </button>
+            </div>
+            {(env.materials || []).map((material) => (
               <MaterialEditor
                 key={material.id}
                 material={material}
                 onUpdate={(updates) => handleUpdateMaterial(env.id, material.id, updates)}
                 onDelete={() => handleRemoveMaterial(env.id, material.id)}
+                isNew={material.name === ''}
+                contentTypes={contentTypes}
               />
             ))}
-            <button
-              onClick={() => handleAddMaterial(env.id)}
-              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Lernressource hinzufügen
-            </button>
           </div>
 
           {/* Werkzeuge */}
           <div className="mt-6">
-            <h3 className="text-lg font-medium mb-2">Werkzeuge</h3>
-            {env.tools.map((tool) => (
+            <div className="mb-4">
+              <h3 className="text-lg font-medium mb-2">Werkzeuge</h3>
+              <button
+                onClick={() => handleAddTool(env.id)}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Werkzeug hinzufügen
+              </button>
+            </div>
+            {(env.tools || []).map((tool) => (
               <ToolEditor
                 key={tool.id}
                 tool={tool}
                 onUpdate={(updates) => handleUpdateTool(env.id, tool.id, updates)}
                 onDelete={() => handleRemoveTool(env.id, tool.id)}
+                isNew={tool.name === ''}
               />
             ))}
-            <button
-              onClick={() => handleAddTool(env.id)}
-              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Werkzeug hinzufügen
-            </button>
           </div>
 
           {/* Dienste */}
           <div className="mt-6">
-            <h3 className="text-lg font-medium mb-2">Dienste</h3>
-            {env.services.map((service) => (
+            <div className="mb-4">
+              <h3 className="text-lg font-medium mb-2">Dienste</h3>
+              <button
+                onClick={() => handleAddService(env.id)}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Dienst hinzufügen
+              </button>
+            </div>
+            {(env.services || []).map((service) => (
               <ServiceEditor
                 key={service.id}
                 service={service}
                 onUpdate={(updates) => handleUpdateService(env.id, service.id, updates)}
                 onDelete={() => handleRemoveService(env.id, service.id)}
+                isNew={service.name === ''}
               />
             ))}
-            <button
-              onClick={() => handleAddService(env.id)}
-              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Dienst hinzufügen
-            </button>
           </div>
         </div>
       ))}

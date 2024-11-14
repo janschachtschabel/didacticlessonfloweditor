@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
 import { processResources } from '../components/wlo/ResourceProcessor';
+import { SaveLoad } from '../components/SaveLoad';
 
 const API_ENDPOINTS = {
   PRODUCTION: 'https://redaktion.openeduhub.net/edu-sharing/rest',
@@ -101,7 +102,10 @@ export function WLOAgent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">WLO Inhalte</h1>
+      <div className="flex justify-between items-start">
+        <h1 className="text-2xl font-bold">WLO Inhalte</h1>
+        <SaveLoad />
+      </div>
 
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">API-Konfiguration</h2>

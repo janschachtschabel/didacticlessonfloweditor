@@ -6,10 +6,11 @@ interface ServiceEditorProps {
   service: Service;
   onUpdate: (updates: Partial<Service>) => void;
   onDelete: () => void;
+  isNew?: boolean;
 }
 
-export function ServiceEditor({ service, onUpdate, onDelete }: ServiceEditorProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function ServiceEditor({ service, onUpdate, onDelete, isNew = false }: ServiceEditorProps) {
+  const [isEditing, setIsEditing] = useState(isNew);
 
   if (!isEditing) {
     return (
@@ -65,6 +66,7 @@ export function ServiceEditor({ service, onUpdate, onDelete }: ServiceEditorProp
           value={service.service_type}
           onChange={(e) => onUpdate({ service_type: e.target.value })}
           className="w-full p-2 border rounded"
+          placeholder="z.B. Förderung, Beratung, Cloud-Dienst, etc."
         />
       </div>
 
@@ -91,31 +93,34 @@ export function ServiceEditor({ service, onUpdate, onDelete }: ServiceEditorProp
         </select>
       </div>
 
-      {service.source === 'database' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
-          <input
-            type="text"
-            value={service.database_id || ''}
-            onChange={(e) => onUpdate({ database_id: e.target.value })}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
+        <input
+          type="text"
+          value={service.database_id || ''}
+          onChange={(e) => onUpdate({ database_id: e.target.value })}
+          className="w-full p-2 border rounded"
+          disabled={service.source !== 'database'}
+        />
+      </div>
 
-      {service.source === 'filter' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Filterkriterien</label>
-          <FilterEditor
-            filter={service.filter_criteria || {}}
-            onChange={(filter) => onUpdate({ filter_criteria: filter })}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Filterkriterien</label>
+        <FilterEditor
+          filter={service.filter_criteria || {}}
+          onChange={(filter) => onUpdate({ filter_criteria: filter })}
+        />
+      </div>
 
       <div className="flex justify-end space-x-2">
         <button
-          onClick={() => setIsEditing(false)}
+          onClick={() => {
+            if (isNew) {
+              onDelete();
+            } else {
+              setIsEditing(false);
+            }
+          }}
           className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
         >
           Abbrechen

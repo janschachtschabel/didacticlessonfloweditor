@@ -6,10 +6,11 @@ interface ToolEditorProps {
   tool: Tool;
   onUpdate: (updates: Partial<Tool>) => void;
   onDelete: () => void;
+  isNew?: boolean;
 }
 
-export function ToolEditor({ tool, onUpdate, onDelete }: ToolEditorProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function ToolEditor({ tool, onUpdate, onDelete, isNew = false }: ToolEditorProps) {
+  const [isEditing, setIsEditing] = useState(isNew);
 
   if (!isEditing) {
     return (
@@ -65,6 +66,7 @@ export function ToolEditor({ tool, onUpdate, onDelete }: ToolEditorProps) {
           value={tool.tool_type}
           onChange={(e) => onUpdate({ tool_type: e.target.value })}
           className="w-full p-2 border rounded"
+          placeholder="z.B. Hardware, Software, Online-Tool, etc."
         />
       </div>
 
@@ -91,31 +93,34 @@ export function ToolEditor({ tool, onUpdate, onDelete }: ToolEditorProps) {
         </select>
       </div>
 
-      {tool.source === 'database' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
-          <input
-            type="text"
-            value={tool.database_id || ''}
-            onChange={(e) => onUpdate({ database_id: e.target.value })}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Datenbank-ID</label>
+        <input
+          type="text"
+          value={tool.database_id || ''}
+          onChange={(e) => onUpdate({ database_id: e.target.value })}
+          className="w-full p-2 border rounded"
+          disabled={tool.source !== 'database'}
+        />
+      </div>
 
-      {tool.source === 'filter' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Filterkriterien</label>
-          <FilterEditor
-            filter={tool.filter_criteria || {}}
-            onChange={(filter) => onUpdate({ filter_criteria: filter })}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Filterkriterien</label>
+        <FilterEditor
+          filter={tool.filter_criteria || {}}
+          onChange={(filter) => onUpdate({ filter_criteria: filter })}
+        />
+      </div>
 
       <div className="flex justify-end space-x-2">
         <button
-          onClick={() => setIsEditing(false)}
+          onClick={() => {
+            if (isNew) {
+              onDelete();
+            } else {
+              setIsEditing(false);
+            }
+          }}
           className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
         >
           Abbrechen

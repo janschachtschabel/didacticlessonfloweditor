@@ -1,6 +1,7 @@
 import { useTemplateStore } from '../store/templateStore';
 import { PhaseEditor } from '../components/course/PhaseEditor';
 import type { LearningSequence, Phase } from '../store/templateStore';
+import { SaveLoad } from '../components/SaveLoad';
 
 export function CourseFlow() {
   const { 
@@ -12,13 +13,16 @@ export function CourseFlow() {
 
   const handleAddSequence = () => {
     const sequences = solution.didactic_template.learning_sequences || [];
+    const sequenceNumber = sequences.length + 1;
+    const sequenceId = `LS${sequenceNumber}`;
+
     const newSequence: LearningSequence = {
-      sequence_id: `LS${sequences.length + 1}`,
+      sequence_id: sequenceId,
       sequence_name: '',
       time_frame: '',
       learning_goal: '',
       phases: [],
-      prerequisite_learningsequence: null,
+      prerequisite_learningsequences: [],
       transition_type: 'sequential',
       condition_description: null,
       next_learningsequence: []
@@ -38,28 +42,28 @@ export function CourseFlow() {
     const sequences = newSolution.didactic_template.learning_sequences;
     const sequence = sequences[index];
 
-    // If prerequisite sequence is being updated
-    if ('prerequisite_learningsequence' in updates) {
-      const oldPrereq = sequence.prerequisite_learningsequence;
-      const newPrereq = updates.prerequisite_learningsequence;
+    // If prerequisite sequences are being updated
+    if ('prerequisite_learningsequences' in updates) {
+      const oldPrereqs = sequence.prerequisite_learningsequences;
+      const newPrereqs = updates.prerequisite_learningsequences || [];
 
-      // Remove this sequence from old prerequisite's next list
-      if (oldPrereq) {
-        const oldPrereqSeq = sequences.find(s => s.sequence_id === oldPrereq);
+      // Remove this sequence from old prerequisites' next list
+      oldPrereqs.forEach(prereqId => {
+        const oldPrereqSeq = sequences.find(s => s.sequence_id === prereqId);
         if (oldPrereqSeq) {
           oldPrereqSeq.next_learningsequence = oldPrereqSeq.next_learningsequence.filter(
             id => id !== sequence.sequence_id
           );
         }
-      }
+      });
 
-      // Add this sequence to new prerequisite's next list
-      if (newPrereq) {
-        const newPrereqSeq = sequences.find(s => s.sequence_id === newPrereq);
+      // Add this sequence to new prerequisites' next list
+      newPrereqs.forEach(prereqId => {
+        const newPrereqSeq = sequences.find(s => s.sequence_id === prereqId);
         if (newPrereqSeq && !newPrereqSeq.next_learningsequence.includes(sequence.sequence_id)) {
           newPrereqSeq.next_learningsequence.push(sequence.sequence_id);
         }
-      }
+      });
     }
 
     Object.assign(sequence, updates);
@@ -69,8 +73,11 @@ export function CourseFlow() {
   const handleAddPhase = (sequenceIndex: number) => {
     const newSolution = { ...solution };
     const sequence = newSolution.didactic_template.learning_sequences[sequenceIndex];
+    const phaseNumber = sequence.phases.length + 1;
+    const phaseId = `${sequence.sequence_id}-P${phaseNumber}`;
+
     const newPhase: Phase = {
-      phase_id: `P${sequence.phases.length + 1}`,
+      phase_id: phaseId,
       phase_name: '',
       time_frame: '',
       learning_goal: '',
@@ -135,7 +142,10 @@ export function CourseFlow() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Unterrichtsablauf</h1>
+      <div className="flex justify-between items-start">
+        <h1 className="text-2xl font-bold">Unterrichtsablauf</h1>
+        <SaveLoad />
+      </div>
 
       <div className="space-y-6">
         {solution.didactic_template?.learning_sequences?.map((sequence, sequenceIndex) => (
@@ -173,43 +183,48 @@ export function CourseFlow() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Voraussetzende Sequenz</label>
-                  <select
-                    value={sequence.prerequisite_learningsequence || ''}
-                    onChange={(e) => handleUpdateSequence(sequenceIndex, { 
-                      prerequisite_learningsequence: e.target.value || null 
-                    })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    <option value="">Keine</option>
-                    {solution.didactic_template.learning_sequences
-                      .filter((_, idx) => idx !== sequenceIndex)
-                      .map(seq => (
-                        <option key={seq.sequence_id} value={seq.sequence_id}>
-                          {seq.sequence_name || seq.sequence_id}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Voraussetzende Sequenzen</label>
+                <select
+                  multiple
+                  value={sequence.prerequisite_learningsequences}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                    handleUpdateSequence(sequenceIndex, { 
+                      prerequisite_learningsequences: selectedOptions
+                    });
+                  }}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  size={3}
+                >
+                  {solution.didactic_template.learning_sequences
+                    .filter((_, idx) => idx !== sequenceIndex)
+                    .map(seq => (
+                      <option key={seq.sequence_id} value={seq.sequence_id}>
+                        {seq.sequence_name || seq.sequence_id}
+                      </option>
+                    ))}
+                </select>
+                <p className="mt-1 text-sm text-gray-500">
+                  Strg/Cmd gedrückt halten für Mehrfachauswahl
+                </p>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Übergangstyp</label>
-                  <select
-                    value={sequence.transition_type}
-                    onChange={(e) => handleUpdateSequence(sequenceIndex, { 
-                      transition_type: e.target.value as LearningSequence['transition_type']
-                    })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    <option value="sequential">Sequenziell</option>
-                    <option value="parallel">Parallel</option>
-                    <option value="conditional">Bedingt</option>
-                    <option value="all_completed">Alle abgeschlossen</option>
-                    <option value="one_of">Eine von</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Übergangstyp</label>
+                <select
+                  value={sequence.transition_type}
+                  onChange={(e) => handleUpdateSequence(sequenceIndex, { 
+                    transition_type: e.target.value as LearningSequence['transition_type']
+                  })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="sequential">Sequenziell</option>
+                  <option value="parallel">Parallel</option>
+                  <option value="conditional">Bedingt</option>
+                  <option value="all_completed">Alle abgeschlossen</option>
+                  <option value="one_of">Eine von</option>
+                </select>
               </div>
 
               {sequence.transition_type === 'conditional' && (
@@ -261,6 +276,7 @@ export function CourseFlow() {
                       onUpdate={(updates) => handleUpdatePhase(sequenceIndex, phaseIndex, updates)}
                       onDelete={() => handleDeletePhase(sequenceIndex, phaseIndex)}
                       availablePhases={sequence.phases.filter((_, idx) => idx !== phaseIndex)}
+                      sequenceId={sequence.sequence_id}
                     />
                   ))}
                 </div>

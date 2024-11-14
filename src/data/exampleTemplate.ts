@@ -1,43 +1,43 @@
-import { Actor, LearningEnvironment } from '../store/templateStore';
+import type { Actor, LearningEnvironment } from '../store/templateStore';
 
 export const exampleActors: Actor[] = [
   {
-    id: "Lehrer1",
+    id: "A1",
     name: "Jan Schachtschabel",
     type: "Einzelperson",
     demographic_data: {
-      age: 46,
+      age: 35,
       gender: "männlich",
-      ethnic_background: "Deutsch"
+      ethnic_background: "deutsch"
     },
     education: {
-      education_level: "Lehramt Mathematik",
-      class_level: "Keine spezifische Klassenstufe",
-      subject_focus: "Mathematik"
+      education_level: "Master of Education",
+      class_level: "Sekundarstufe I",
+      subject_focus: "Mathematik, Informatik"
     },
     competencies: {
-      subject_competencies: ["Mathematikdidaktik", "Differenzierung", "Sprachförderung"],
-      cognitive_competencies: ["Kritisches Denken", "Problemlösung"],
-      methodical_competencies: ["Projektmanagement", "Differenzierte Lehrmethoden"],
+      subject_competencies: ["Mathematik", "Informatik"],
+      cognitive_competencies: ["Analytisches Denken", "Problemlösung"],
+      methodical_competencies: ["Differenzierte Unterrichtsgestaltung", "Digitale Mediennutzung"],
       affective_competencies: ["Empathie", "Geduld"],
-      digital_competencies: ["Digitale Lehrtools", "Lernplattformen"],
+      digital_competencies: ["Lernplattformen", "Digitale Werkzeuge"],
       language_skills: {
         languages: ["Deutsch", "Englisch"],
         proficiency_levels: {
-          "Deutsch": "Muttersprache",
+          "Deutsch": "C2",
           "Englisch": "B2"
         }
       }
     },
     social_form: "Lehrkraft",
     learning_requirements: {
-      learning_preferences: ["Visuell", "Interaktiv"],
+      learning_preferences: ["Praxisorientiert", "Digital"],
       special_needs: [],
-      technical_requirements: ["Laptop", "Dokumentenkamera"]
+      technical_requirements: ["Computer", "Präsentationssystem"]
     },
     interests_and_goals: {
-      interests: ["Mathematikdidaktik", "Inklusive Bildung"],
-      goals: ["Erfolgreiche Vermittlung", "Individuelle Förderung"],
+      interests: ["Digitale Bildung", "Inklusive Pädagogik"],
+      goals: ["Förderung individueller Lernwege", "Integration digitaler Medien"],
       motivation: {
         type: "intrinsic",
         level: "high"
@@ -49,94 +49,94 @@ export const exampleActors: Actor[] = [
     }
   },
   {
-    id: "Gruppe1",
-    name: "Schüler Hauptgruppe",
+    id: "A2",
+    name: "Hauptlerngruppe",
     type: "Gruppe",
     demographic_data: {
-      age: 13,
+      age_range: "14-15",
       gender_distribution: "gemischt",
-      ethnic_background: "Gemischt"
+      ethnic_background: "diverse"
     },
     education: {
-      education_level: "7. Klasse",
-      class_level: "Mittelstufe",
+      education_level: "Sekundarstufe I",
+      class_level: "9. Klasse",
       subject_focus: "Mathematik"
     },
     competencies: {
-      subject_competencies: ["Grundrechenarten", "Mathematisches Denken"],
-      cognitive_competencies: ["Logisches Denken"],
-      methodical_competencies: ["Gruppenarbeit"],
+      subject_competencies: ["Grundrechenarten", "Algebra Grundlagen"],
+      cognitive_competencies: ["Logisches Denken", "Abstraktion"],
+      methodical_competencies: ["Gruppenarbeit", "Selbstorganisation"],
       affective_competencies: ["Teamfähigkeit"],
       digital_competencies: ["Grundlegende PC-Kenntnisse"],
       language_skills: {
         languages: ["Deutsch"],
         proficiency_levels: {
-          "Deutsch": "Muttersprache"
+          "Deutsch": "C1"
         }
       }
     },
     social_form: "Klassenverband",
     learning_requirements: {
-      learning_preferences: ["Praktisch", "Visuell"],
+      learning_preferences: ["Praktische Übungen", "Visuelle Darstellungen"],
       special_needs: [],
       technical_requirements: ["Taschenrechner"]
     },
     interests_and_goals: {
-      interests: ["Mathematik", "Gruppenarbeit"],
-      goals: ["Verständnis der Addition"],
+      interests: ["Mathematik", "Digitale Medien"],
+      goals: ["Verständnis der Addition", "Problemlösekompetenz"],
       motivation: {
         type: "mixed",
         level: "medium"
       }
     },
     social_structure: {
-      group_size: 15,
+      group_size: 20,
       heterogeneity: "mittel"
     }
   },
   {
-    id: "Gruppe2",
-    name: "Schüler Sprachfördergruppe",
+    id: "A3",
+    name: "Sprachfördergruppe",
     type: "Gruppe",
     demographic_data: {
-      age: 13,
+      age_range: "14-15",
       gender_distribution: "gemischt",
-      ethnic_background: "Gemischt"
+      ethnic_background: "diverse"
     },
     education: {
-      education_level: "7. Klasse",
-      class_level: "Mittelstufe",
+      education_level: "Sekundarstufe I",
+      class_level: "9. Klasse",
       subject_focus: "Mathematik"
     },
     competencies: {
       subject_competencies: ["Grundrechenarten"],
       cognitive_competencies: ["Logisches Denken"],
-      methodical_competencies: ["Gruppenarbeit"],
+      methodical_competencies: ["Visualisierung"],
       affective_competencies: ["Teamfähigkeit"],
       digital_competencies: ["Grundlegende PC-Kenntnisse"],
       language_skills: {
         languages: ["Deutsch"],
         proficiency_levels: {
-          "Deutsch": "A2-B1"
+          "Deutsch": "B1"
         }
       }
     },
     social_form: "Fördergruppe",
     learning_requirements: {
-      learning_preferences: ["Visuell", "Praktisch"],
+      learning_preferences: ["Visuelle Unterstützung", "Sprachliche Hilfen"],
       special_needs: ["Sprachförderung"],
-      technical_requirements: ["Tablet", "Übersetzungs-App"]
+      technical_requirements: ["Taschenrechner"]
     },
     interests_and_goals: {
-      interests: ["Mathematik", "Sprachen"],
-      goals: ["Verständnis der Addition", "Sprachverbesserung"],
+      interests: ["Mathematik"],
+      goals: ["Sprachkompetenz", "Mathematisches Verständnis"],
       motivation: {
-        type: "intrinsic",
-        level: "high"
+        type: "mixed",
+        level: "medium"
       }
     },
     social_structure: {
-      group_size: 5,
+      group_size: 8,
       heterogeneity: "hoch"
     }
   }
@@ -144,69 +144,90 @@ export const exampleActors: Actor[] = [
 
 export const exampleEnvironments: LearningEnvironment[] = [
   {
-    id: "Env1",
+    id: "ENV1",
     name: "Mathematik-Klassenraum",
     description: "Klassenraum mit digitaler und analoger Ausstattung für Mathematikunterricht",
     materials: [
       {
-        id: "Mat1",
+        id: "ENV1-M1",
         name: "Arbeitsblätter Addition",
         material_type: "Arbeitsblatt",
-        access_link: "materials/addition_standard.pdf",
-        source: "manual"
+        source: "manual",
+        access_link: "materials/addition_standard.pdf"
       },
       {
-        id: "Mat2",
+        id: "ENV1-M2",
         name: "Visualisierungskarten",
         material_type: "Bildkarten",
-        access_link: "materials/visual_cards.pdf",
-        source: "manual"
+        source: "manual",
+        access_link: "materials/visual_cards.pdf"
       },
       {
-        id: "Mat3",
+        id: "ENV1-M3",
         name: "Mehrsprachiges Mathe-Glossar",
         material_type: "Glossar",
-        access_link: "materials/math_glossary.pdf",
-        source: "manual"
+        source: "manual",
+        access_link: "materials/math_glossary.pdf"
+      },
+      {
+        id: "ENV1-M4",
+        name: "Interaktive Übungen",
+        material_type: "Digitales Lernmaterial",
+        source: "manual",
+        access_link: "https://example.com/math-exercises"
       }
     ],
     tools: [
       {
-        id: "Tool1",
+        id: "ENV1-T1",
         name: "Dokumentenkamera",
         tool_type: "Hardware",
-        access_link: "",
-        source: "manual"
+        source: "manual",
+        access_link: ""
       },
       {
-        id: "Tool2",
+        id: "ENV1-T2",
         name: "Taschenrechner",
         tool_type: "Hardware",
-        access_link: "",
-        source: "manual"
+        source: "manual",
+        access_link: ""
       },
       {
-        id: "Tool3",
+        id: "ENV1-T3",
         name: "Mathematik-App",
         tool_type: "Software",
-        access_link: "apps/math_trainer",
-        source: "manual"
+        source: "manual",
+        access_link: "apps/math_trainer"
+      },
+      {
+        id: "ENV1-T4",
+        name: "Digitales Whiteboard",
+        tool_type: "Hardware",
+        source: "manual",
+        access_link: ""
       }
     ],
     services: [
       {
-        id: "Service1",
+        id: "ENV1-S1",
         name: "Sprachunterstützung",
         service_type: "Förderung",
-        access_link: "",
-        source: "manual"
+        source: "manual",
+        access_link: ""
       },
       {
-        id: "Service2",
+        id: "ENV1-S2",
         name: "Mathematische Förderung",
         service_type: "Förderung",
-        access_link: "",
-        source: "manual"
+        source: "manual",
+        access_link: ""
+      },
+      {
+        id: "ENV1-S3",
+        name: "Online-Lernplattform",
+        service_type: "Digital",
+        source: "manual",
+        access_link: "https://example.com/platform"
       }
     ]
   }
@@ -214,240 +235,310 @@ export const exampleEnvironments: LearningEnvironment[] = [
 
 export const exampleTemplate = {
   metadata: {
-    title: "Addition mit Sprachförderung",
-    description: "Eine inklusive Mathematikstunde zur Addition mit besonderer Berücksichtigung von Sprachförderung",
-    keywords: ["Mathematik", "Addition", "Sprachförderung", "Inklusion"],
+    title: "Addition für alle – inklusive Mathematik",
+    description: "Ein inklusives Lernobjekt zur Förderung der Additionsfähigkeiten und Sprachkompetenzen bei Schülern der 9. Klasse",
+    keywords: ["Addition", "Mathematik", "Inklusion", "Sprachförderung", "Differenzierung"],
     author: "Jan Schachtschabel",
     version: "1.0"
   },
   problem: {
-    problem_description: "Einführung in die Addition unter Berücksichtigung unterschiedlicher Sprachniveaus",
+    problem_description: "Schüler mit unterschiedlichen sprachlichen Voraussetzungen sollen die Bedeutung und Anwendung der Addition verstehen und ihre mathematischen sowie sprachlichen Kompetenzen entwickeln.",
     learning_goals: [
-      "Verständnis der Addition",
-      "Mathematische Fachsprache",
-      "Sprachkompetenz"
+      "Verständnis der Grundlagen der Addition",
+      "Anwendung der Addition in verschiedenen Kontexten",
+      "Förderung der sprachlichen Kompetenzen",
+      "Entwicklung von Problemlösefähigkeiten"
     ],
-    didactic_keywords: ["Differenzierung", "Sprachsensibel", "Visuell"]
+    didactic_keywords: ["Differenzierung", "Inklusion", "Sprachsensibler Fachunterricht", "Digitale Medien"]
   },
   context: {
-    target_group: "7. Klasse mit Sprachförderbedarf",
+    target_group: "Schüler der 9. Klasse mit heterogenen Sprachkenntnissen",
     subject: "Mathematik",
     educational_level: "Sekundarstufe I",
-    prerequisites: "Grundlegendes Zahlenverständnis",
+    prerequisites: "Grundlegende Deutschkenntnisse, Zahlenverständnis",
     time_frame: "45 Minuten"
   },
   influence_factors: [
     {
-      factor: "Sprachniveau",
-      description: "Unterschiedliche Deutschkenntnisse der Lernenden"
+      factor: "Sprachliche Heterogenität",
+      description: "Unterschiedliche Deutschkenntnisse erfordern differenzierte sprachliche Unterstützung"
     },
     {
-      factor: "Vorwissen",
-      description: "Heterogenes mathematisches Vorwissen"
+      factor: "Digitale Kompetenzen",
+      description: "Verschiedene Erfahrungsniveaus mit digitalen Werkzeugen"
+    },
+    {
+      factor: "Lernmotivation",
+      description: "Unterschiedliche Motivationslagen und Interessensbereiche"
     }
   ],
   solution: {
-    solution_description: "Differenzierter Unterricht mit visueller Unterstützung",
-    didactic_approach: "Sprachsensibler Mathematikunterricht",
+    solution_description: "Implementierung eines differenzierten, sprachsensiblen Mathematikunterrichts mit digitaler Unterstützung",
+    didactic_approach: "Handlungsorientiertes und entdeckendes Lernen mit digitaler und sprachlicher Unterstützung",
     didactic_template: {
       learning_sequences: [
         {
           sequence_id: "LS1",
           sequence_name: "Einführung in die Addition",
           time_frame: "45 Minuten",
-          learning_goal: "Grundlegendes Verständnis der Addition",
+          learning_goal: "Grundlegendes Verständnis der Addition und ihrer sprachlichen Darstellung",
           phases: [
             {
-              phase_id: "P1",
+              phase_id: "LS1-P1",
               phase_name: "Aktivierung",
               time_frame: "10 Minuten",
-              learning_goal: "Vorwissen aktivieren",
+              learning_goal: "Vorwissen aktivieren und Interesse wecken",
               activities: [
                 {
-                  activity_id: "A1",
+                  activity_id: "LS1-P1-A1",
                   name: "Zahlenspiel",
                   description: "Spielerische Einführung mit visuellen Elementen",
                   duration: 10,
-                  roles: [
-                    {
-                      role_name: "Moderator",
-                      actor_id: "Lehrer1",
-                      task_description: "Leitet das Zahlenspiel und stellt gezielte Fragen",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2", "Mat3"],
-                        selected_tools: ["Tool1"],
-                        selected_services: ["Service1"]
-                      }
-                    },
-                    {
-                      role_name: "Teilnehmer Hauptgruppe",
-                      actor_id: "Gruppe1",
-                      task_description: "Aktive Teilnahme am Zahlenspiel",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2"],
-                        selected_tools: ["Tool2"],
-                        selected_services: []
-                      }
-                    },
-                    {
-                      role_name: "Teilnehmer Sprachförderung",
-                      actor_id: "Gruppe2",
-                      task_description: "Teilnahme am Zahlenspiel mit sprachlicher Unterstützung",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat2", "Mat3"],
-                        selected_tools: ["Tool2", "Tool3"],
-                        selected_services: ["Service1"]
-                      }
-                    }
-                  ],
                   goal: "Spielerisches Aufwärmen und Aktivierung des Vorwissens",
                   prerequisite_activity: null,
                   transition_type: "sequential",
                   condition_description: null,
-                  next_activity: ["A2"],
+                  next_activity: ["LS1-P2-A1"],
                   assessment: {
                     type: "formative",
                     methods: ["Beobachtung"],
                     criteria: ["Aktive Teilnahme", "Grundverständnis"]
-                  }
+                  },
+                  roles: [
+                    {
+                      role_id: "LS1-P1-A1-R1",
+                      role_name: "Moderator",
+                      actor_id: "A1",
+                      task_description: "Leitet das Zahlenspiel und stellt gezielte Fragen",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M2"],
+                        selected_tools: ["ENV1-T1", "ENV1-T4"],
+                        selected_services: []
+                      }
+                    },
+                    {
+                      role_id: "LS1-P1-A1-R2",
+                      role_name: "Teilnehmer Hauptgruppe",
+                      actor_id: "A2",
+                      task_description: "Aktive Teilnahme am Zahlenspiel",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M2"],
+                        selected_tools: [],
+                        selected_services: []
+                      }
+                    },
+                    {
+                      role_id: "LS1-P1-A1-R3",
+                      role_name: "Teilnehmer Sprachförderung",
+                      actor_id: "A3",
+                      task_description: "Teilnahme am Zahlenspiel mit sprachlicher Unterstützung",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M2", "ENV1-M3"],
+                        selected_tools: [],
+                        selected_services: ["ENV1-S1"]
+                      }
+                    }
+                  ]
                 }
               ],
               prerequisite_phase: null,
               transition_type: "sequential",
               condition_description: null,
-              next_phase: "P2"
+              next_phase: "LS1-P2"
             },
             {
-              phase_id: "P2",
+              phase_id: "LS1-P2",
               phase_name: "Erarbeitung",
               time_frame: "20 Minuten",
-              learning_goal: "Verständnis der Additionsregeln",
+              learning_goal: "Selbstständige Erarbeitung der Additionsregeln",
               activities: [
                 {
-                  activity_id: "A2",
+                  activity_id: "LS1-P2-A1",
                   name: "Regelentdeckung",
                   description: "Entdeckung der Additionsregeln anhand von Beispielen",
-                  duration: 20,
-                  roles: [
-                    {
-                      role_name: "Anleiter",
-                      actor_id: "Lehrer1",
-                      task_description: "Begleitet den Entdeckungsprozess und unterstützt bei sprachlichen Herausforderungen",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2", "Mat3"],
-                        selected_tools: ["Tool1"],
-                        selected_services: ["Service1"]
-                      }
-                    },
-                    {
-                      role_name: "Lerngruppe Standard",
-                      actor_id: "Gruppe1",
-                      task_description: "Erarbeitet die Regeln in Partnerarbeit",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2"],
-                        selected_tools: ["Tool2"],
-                        selected_services: []
-                      }
-                    },
-                    {
-                      role_name: "Lerngruppe Sprachförderung",
-                      actor_id: "Gruppe2",
-                      task_description: "Erarbeitet die Regeln mit sprachlicher Unterstützung und visualisierten Beispielen",
-                      learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat2", "Mat3"],
-                        selected_tools: ["Tool2", "Tool3"],
-                        selected_services: ["Service1", "Service2"]
-                      }
-                    }
-                  ],
+                  duration: 10,
                   goal: "Selbstständige Erarbeitung der Additionsregeln",
-                  prerequisite_activity: "A1",
-                  transition_type: "sequential",
+                  prerequisite_activity: "LS1-P1-A1",
+                  transition_type: "parallel",
                   condition_description: null,
-                  next_activity: ["A3"],
+                  next_activity: ["LS1-P2-A2"],
                   assessment: {
                     type: "formative",
                     methods: ["Peer-Feedback", "Selbstreflexion"],
                     criteria: ["Regelverständnis", "Zusammenarbeit"]
-                  }
-                }
-              ],
-              prerequisite_phase: "P1",
-              transition_type: "sequential",
-              condition_description: null,
-              next_phase: "P3"
-            },
-            {
-              phase_id: "P3",
-              phase_name: "Sicherung",
-              time_frame: "15 Minuten",
-              learning_goal: "Festigung der Additionsregeln",
-              activities: [
-                {
-                  activity_id: "A3",
-                  name: "Präsentation und Diskussion",
-                  description: "Vorstellen der entdeckten Regeln und gemeinsame Diskussion",
-                  duration: 15,
+                  },
                   roles: [
                     {
-                      role_name: "Moderator",
-                      actor_id: "Lehrer1",
-                      task_description: "Moderiert die Diskussion und fasst Ergebnisse zusammen",
+                      role_id: "LS1-P2-A1-R1",
+                      role_name: "Lernbegleiter",
+                      actor_id: "A1",
+                      task_description: "Unterstützt den Entdeckungsprozess und gibt Hilfestellung",
                       learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2", "Mat3"],
-                        selected_tools: ["Tool1"],
-                        selected_services: ["Service1"]
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M2", "ENV1-M3"],
+                        selected_tools: ["ENV1-T1", "ENV1-T4"],
+                        selected_services: ["ENV1-S1", "ENV1-S2"]
                       }
                     },
                     {
-                      role_name: "Präsentierende Hauptgruppe",
-                      actor_id: "Gruppe1",
-                      task_description: "Stellt eigene Erkenntnisse vor",
+                      role_id: "LS1-P2-A1-R2",
+                      role_name: "Entdecker Hauptgruppe",
+                      actor_id: "A2",
+                      task_description: "Erarbeitet die Regeln in Partnerarbeit",
                       learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat1", "Mat2"],
-                        selected_tools: ["Tool1"],
-                        selected_services: []
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M4"],
+                        selected_tools: ["ENV1-T2", "ENV1-T3"],
+                        selected_services: ["ENV1-S3"]
                       }
                     },
                     {
-                      role_name: "Präsentierende Sprachfördergruppe",
-                      actor_id: "Gruppe2",
-                      task_description: "Stellt Erkenntnisse mit visueller Unterstützung vor",
+                      role_id: "LS1-P2-A1-R3",
+                      role_name: "Entdecker Sprachförderung",
+                      actor_id: "A3",
+                      task_description: "Erarbeitet die Regeln mit sprachlicher Unterstützung",
                       learning_environment: {
-                        environment_id: "Env1",
-                        selected_materials: ["Mat2", "Mat3"],
-                        selected_tools: ["Tool1", "Tool3"],
-                        selected_services: ["Service1"]
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M3", "ENV1-M4"],
+                        selected_tools: ["ENV1-T2", "ENV1-T3"],
+                        selected_services: ["ENV1-S1", "ENV1-S2", "ENV1-S3"]
                       }
                     }
-                  ],
+                  ]
+                },
+                {
+                  activity_id: "LS1-P2-A2",
+                  name: "Übungsphase",
+                  description: "Anwendung der entdeckten Regeln",
+                  duration: 10,
+                  goal: "Festigung der Additionsregeln durch Übung",
+                  prerequisite_activity: "LS1-P2-A1",
+                  transition_type: "branching",
+                  condition_description: "Basierend auf Lernerfolg: Zusatzaufgaben oder Wiederholung",
+                  next_activity: ["LS1-P3-A1"],
+                  is_optional: false,
+                  repeat_until: "80% der Aufgaben korrekt gelöst",
+                  assessment: {
+                    type: "formative",
+                    methods: ["Selbstkontrolle", "Automatische Auswertung"],
+                    criteria: ["Korrektheit", "Lösungsweg"]
+                  },
+                  roles: [
+                    {
+                      role_id: "LS1-P2-A2-R1",
+                      role_name: "Lernbegleiter",
+                      actor_id: "A1",
+                      task_description: "Beobachtet und unterstützt bei Bedarf",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1"],
+                        selected_tools: ["ENV1-T4"],
+                        selected_services: ["ENV1-S2"]
+                      }
+                    },
+                    {
+                      role_id: "LS1-P2-A2-R2",
+                      role_name: "Übende Hauptgruppe",
+                      actor_id: "A2",
+                      task_description: "Bearbeitet Übungsaufgaben selbstständig",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M4"],
+                        selected_tools: ["ENV1-T2", "ENV1-T3"],
+                        selected_services: ["ENV1-S3"]
+                      }
+                    },
+                    {
+                      role_id: "LS1-P2-A2-R3",
+                      role_name: "Übende Sprachförderung",
+                      actor_id: "A3",
+                      task_description: "Bearbeitet sprachsensible Übungsaufgaben",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M3", "ENV1-M4"],
+                        selected_tools: ["ENV1-T2", "ENV1-T3"],
+                        selected_services: ["ENV1-S1", "ENV1-S2", "ENV1-S3"]
+                      }
+                    }
+                  ]
+                }
+              ],
+              prerequisite_phase: "LS1-P1",
+              transition_type: "sequential",
+              condition_description: null,
+              next_phase: "LS1-P3"
+            },
+            {
+              phase_id: "LS1-P3",
+              phase_name: "Sicherung",
+              time_frame: "15 Minuten",
+              learning_goal: "Gemeinsame Reflexion und Sicherung der Erkenntnisse",
+              activities: [
+                {
+                  activity_id: "LS1-P3-A1",
+                  name: "Präsentation und Diskussion",
+                  description: "Vorstellen der Erkenntnisse und gemeinsame Diskussion",
+                  duration: 15,
                   goal: "Gemeinsames Verständnis der Additionsregeln",
-                  prerequisite_activity: "A2",
-                  transition_type: "sequential",
-                  condition_description: null,
+                  prerequisite_activity: "LS1-P2-A2",
+                  transition_type: "feedback_loops",
+                  condition_description: "Bei Bedarf Rückkehr zu einzelnen Konzepten",
                   next_activity: [],
                   assessment: {
                     type: "summative",
                     methods: ["Präsentation", "Diskussionsbeteiligung"],
                     criteria: ["Verständnis", "Kommunikationsfähigkeit"]
-                  }
+                  },
+                  roles: [
+                    {
+                      role_id: "LS1-P3-A1-R1",
+                      role_name: "Moderator",
+                      actor_id: "A1",
+                      task_description: "Moderiert die Diskussion und fasst Ergebnisse zusammen",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M2"],
+                        selected_tools: ["ENV1-T1", "ENV1-T4"],
+                        selected_services: []
+                      }
+                    },
+                    {
+                      role_id: "LS1-P3-A1-R2",
+                      role_name: "Präsentierende Hauptgruppe",
+                      actor_id: "A2",
+                      task_description: "Stellt Erkenntnisse vor und beteiligt sich an Diskussion",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M1", "ENV1-M2"],
+                        selected_tools: ["ENV1-T4"],
+                        selected_services: []
+                      }
+                    },
+                    {
+                      role_id: "LS1-P3-A1-R3",
+                      role_name: "Präsentierende Sprachförderung",
+                      actor_id: "A3",
+                      task_description: "Stellt Erkenntnisse mit Visualisierungen vor",
+                      learning_environment: {
+                        environment_id: "ENV1",
+                        selected_materials: ["ENV1-M2", "ENV1-M3"],
+                        selected_tools: ["ENV1-T4"],
+                        selected_services: ["ENV1-S1"]
+                      }
+                    }
+                  ]
                 }
               ],
-              prerequisite_phase: "P2",
+              prerequisite_phase: "LS1-P2",
               transition_type: "sequential",
               condition_description: null,
               next_phase: null
             }
           ],
-          prerequisite_learningsequence: null,
+          prerequisite_learningsequences: [],
           transition_type: "sequential",
           condition_description: null,
           next_learningsequence: []
@@ -457,40 +548,67 @@ export const exampleTemplate = {
   },
   consequences: {
     advantages: [
-      "Differenzierte Förderung",
-      "Sprachsensible Gestaltung",
-      "Visuelle Unterstützung"
+      "Individuelle Förderung durch differenzierte Materialien",
+      "Integration von Sprach- und Fachlernen",
+      "Aktive Beteiligung aller Schüler",
+      "Flexible Anpassung an verschiedene Lerngeschwindigkeiten"
     ],
     disadvantages: [
       "Hoher Vorbereitungsaufwand",
-      "Komplexe Materialerstellung"
+      "Komplexe Materialerstellung",
+      "Herausforderung bei der Koordination verschiedener Gruppen"
     ]
   },
   implementation_notes: [
     {
-      note_id: "N1",
-      description: "Materialien mehrsprachig vorbereiten"
+      note_id: "Note1",
+      description: "Materialien vorab mehrsprachig aufbereiten"
     },
     {
-      note_id: "N2",
-      description: "Visualisierungen für alle Konzepte erstellen"
+      note_id: "Note2",
+      description: "Technische Ausstattung vor Unterrichtsbeginn prüfen"
+    },
+    {
+      note_id: "Note3",
+      description: "Klare Signale für Phasenwechsel vereinbaren"
     }
   ],
   related_patterns: [
     "Sprachsensibler Fachunterricht",
-    "Differenzierte Gruppenarbeit"
+    "Digitale Lernbegleitung",
+    "Kooperatives Lernen",
+    "Individualisiertes Lernen"
   ],
   feedback: {
-    comments: []
+    comments: [
+      {
+        date: "2024-03-14",
+        name: "Dr. Schmidt",
+        comment: "Sehr gut strukturiertes Konzept mit durchdachter Differenzierung"
+      },
+      {
+        date: "2024-03-15",
+        name: "Prof. Meyer",
+        comment: "Gelungene Integration von Sprach- und Fachlernen"
+      }
+    ]
   },
   sources: [
     {
       source_id: "S1",
-      title: "Sprachsensibler Mathematikunterricht",
-      author: "Meyer, M.",
+      title: "Sprachsensibler Fachunterricht",
+      author: "Josef Leisen",
+      year: 2019,
+      publisher: "Klett-Kallmeyer",
+      url: "https://example.com/sprachsensibler-fachunterricht"
+    },
+    {
+      source_id: "S2",
+      title: "Digitale Medien im inklusiven Mathematikunterricht",
+      author: "Maria Weber",
       year: 2023,
       publisher: "Bildungsverlag",
-      url: "https://example.com/math-language"
+      url: "https://example.com/digitale-medien-mathe"
     }
   ],
   actors: exampleActors,

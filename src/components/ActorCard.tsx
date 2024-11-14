@@ -6,7 +6,30 @@ interface ActorCardProps {
   onDelete: () => void;
 }
 
+const defaultEducation = {
+  education_level: '',
+  class_level: '',
+  subject_focus: ''
+};
+
+const defaultLanguageSkills = {
+  languages: [],
+  proficiency_levels: {}
+};
+
+const defaultCompetencies = {
+  subject_competencies: [],
+  cognitive_competencies: [],
+  methodical_competencies: [],
+  affective_competencies: [],
+  digital_competencies: [],
+  language_skills: defaultLanguageSkills
+};
+
 export function ActorCard({ actor, onEdit, onDelete }: ActorCardProps) {
+  const education = actor.education || defaultEducation;
+  const competencies = actor.competencies || defaultCompetencies;
+
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex justify-between items-start">
@@ -15,11 +38,11 @@ export function ActorCard({ actor, onEdit, onDelete }: ActorCardProps) {
           <p className="text-sm text-gray-500 capitalize">{actor.type}</p>
           <div className="mt-2 space-y-2">
             <p className="text-sm">
-              <span className="font-medium">Bildung:</span> {actor.education.education_level}
+              <span className="font-medium">Bildung:</span> {education.education_level}
             </p>
             <p className="text-sm">
               <span className="font-medium">Sprachen:</span>{' '}
-              {actor.competencies.language_skills.languages.join(', ')}
+              {competencies.language_skills.languages.join(', ') || 'Keine angegeben'}
             </p>
           </div>
         </div>

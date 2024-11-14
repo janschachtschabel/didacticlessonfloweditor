@@ -61,7 +61,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
   // Process sequences and their components
   const sequences = state.solution?.didactic_template?.learning_sequences || [];
   sequences.forEach((sequence, seqIndex) => {
-    const sequenceId = `sequence-${sequence.sequence_id}`;
+    const sequenceId = sequence.sequence_id;
     nodes.push({
       id: sequenceId,
       data: {
@@ -97,10 +97,31 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       });
     }
 
+    // Connect prerequisite sequences if they exist
+    if (sequence.prerequisite_learningsequences?.length > 0) {
+      sequence.prerequisite_learningsequences.forEach(prereqId => {
+        edges.push({
+          id: `prereq-${prereqId}-${sequenceId}`,
+          source: prereqId,
+          target: sequenceId,
+          animated: true,
+          style: { stroke: sequence.transition_type === 'parallel' ? '#9333ea' : '#FF8C00' },
+          label: sequence.transition_type === 'parallel' ? 'parallel' : 
+                 sequence.transition_type === 'all_completed' ? 'alle abgeschlossen' :
+                 sequence.transition_type === 'one_of' ? 'eine von' :
+                 sequence.transition_type === 'conditional' ? 'bedingt' : 'sequenziell',
+          labelStyle: { 
+            fill: sequence.transition_type === 'parallel' ? '#9333ea' : '#FF8C00',
+            fontWeight: 'bold'
+          }
+        });
+      });
+    }
+
     // Process phases within sequence
     const phases = sequence.phases || [];
     phases.forEach((phase, phaseIndex) => {
-      const phaseId = `phase-${phase.phase_id}`;
+      const phaseId = phase.phase_id;
       nodes.push({
         id: phaseId,
         data: {
@@ -130,15 +151,14 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       });
 
       // Add sequence flow between phases
-      if (phaseIndex > 0) {
-        const prevPhaseId = `phase-${phases[phaseIndex - 1].phase_id}`;
+      if (phase.prerequisite_phase) {
         edges.push({
-          id: `flow-${prevPhaseId}-${phaseId}`,
-          source: prevPhaseId,
+          id: `flow-${phase.prerequisite_phase}-${phaseId}`,
+          source: phase.prerequisite_phase,
           target: phaseId,
           animated: true,
           style: { stroke: '#FF8C00' },
-          label: `Schritt ${phaseIndex + 1}`,
+          label: `Phase ${phaseIndex + 1}`,
           labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
         });
       }
@@ -146,7 +166,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
       // Process activities within phase
       const activities = phase.activities || [];
       activities.forEach((activity, activityIndex) => {
-        const activityId = `activity-${activity.activity_id}`;
+        const activityId = activity.activity_id;
         nodes.push({
           id: activityId,
           data: {
@@ -179,41 +199,41 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
           label: 'enthält'
         });
 
-        // Add sequence flow between activities
-        if (activityIndex > 0) {
-          const prevActivityId = `activity-${activities[activityIndex - 1].activity_id}`;
+        // Add sequence flow between activities based on transition type
+        if (activity.prerequisite_activity) {
+          const edgeStyle = activity.transition_type === 'parallel' ? '#9333ea' : '#FF8C00';
           edges.push({
-            id: `flow-${prevActivityId}-${activityId}`,
-            source: prevActivityId,
+            id: `flow-${activity.prerequisite_activity}-${activityId}`,
+            source: activity.prerequisite_activity,
             target: activityId,
             animated: true,
-            style: { stroke: '#FF8C00' },
-            label: `Schritt ${activityIndex + 1}`,
-            labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
+            style: { stroke: edgeStyle },
+            label: activity.transition_type,
+            labelStyle: { fill: edgeStyle, fontWeight: 'bold' }
           });
         }
 
         // Process roles within activity
         const activityRoles = activity.roles || [];
         activityRoles.forEach((role, roleIndex) => {
-          const roleId = `role-${activity.activity_id}-${role.role_name}`;
-          const actor = state.actors.find(a => a.id === role.actor_id);
-          const environment = state.environments.find(env => 
+          const roleId = role.role_id;
+          const actor = state.actors?.find(a => a.id === role.actor_id);
+          const environment = state.environments?.find(env => 
             env.id === role.learning_environment?.environment_id
           );
 
           const selectedMaterials = role.learning_environment?.selected_materials?.map(id => {
-            const material = environment?.materials.find(m => m.id === id);
+            const material = environment?.materials?.find(m => m.id === id);
             return material?.name;
           }).filter(Boolean) || [];
 
           const selectedTools = role.learning_environment?.selected_tools?.map(id => {
-            const tool = environment?.tools.find(t => t.id === id);
+            const tool = environment?.tools?.find(t => t.id === id);
             return tool?.name;
           }).filter(Boolean) || [];
 
           const selectedServices = role.learning_environment?.selected_services?.map(id => {
-            const service = environment?.services.find(s => s.id === id);
+            const service = environment?.services?.find(s => s.id === id);
             return service?.name;
           }).filter(Boolean) || [];
 
@@ -290,7 +310,7 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
 
           // Add parallel execution edges between roles in the same activity
           if (roleIndex > 0) {
-            const prevRoleId = `role-${activity.activity_id}-${activityRoles[roleIndex - 1].role_name}`;
+            const prevRoleId = activityRoles[roleIndex - 1].role_id;
             edges.push({
               id: `parallel-${prevRoleId}-${roleId}`,
               source: prevRoleId,
@@ -304,21 +324,6 @@ export function createNodes(state: ReturnType<typeof TemplateStore.getState>) {
         });
       });
     });
-  });
-
-  // Add edges for sequential connections between sequences
-  sequences.forEach((sequence, index) => {
-    if (index > 0) {
-      edges.push({
-        id: `flow-sequence-${sequences[index - 1].sequence_id}-${sequence.sequence_id}`,
-        source: `sequence-${sequences[index - 1].sequence_id}`,
-        target: `sequence-${sequence.sequence_id}`,
-        animated: true,
-        style: { stroke: '#FF8C00' },
-        label: `Sequenz ${index + 1}`,
-        labelStyle: { fill: '#FF8C00', fontWeight: 'bold' }
-      });
-    }
   });
 
   // Layout the graph

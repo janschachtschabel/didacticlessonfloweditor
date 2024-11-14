@@ -3,6 +3,7 @@ import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
 import { generateFilterCriteria } from '../lib/filterUtils';
 import { FILTER_PROPERTIES } from '../lib/mappings';
+import { SaveLoad } from '../components/SaveLoad';
 
 const AI_MODELS = [
   { id: 'gpt-4o-mini', name: 'GPT-4O Mini' },
@@ -187,7 +188,10 @@ export function AIFilterAgent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">KI Filter</h1>
+      <div className="flex justify-between items-start">
+        <h1 className="text-2xl font-bold">KI Filter</h1>
+        <SaveLoad />
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

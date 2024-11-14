@@ -66,15 +66,13 @@ export async function searchWLO({
       endpoint
     });
 
-    // Direct request to WLO API
+    // Direkter API-Aufruf
     const response = await fetch(`${endpoint}/search/v1/custom/-home-?${params.toString()}`, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Accept': 'application/json'
       },
-      signal: controller.signal,
-      mode: 'cors'
+      signal: controller.signal
     });
 
     clearTimeout(timeoutId);

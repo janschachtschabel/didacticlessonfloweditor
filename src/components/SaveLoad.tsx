@@ -26,7 +26,7 @@ export function SaveLoad() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'template.json';
+    a.download = `${template.metadata.title || 'template'}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -43,7 +43,6 @@ export function SaveLoad() {
         const content = e.target?.result as string;
         const template = JSON.parse(content);
         
-        // Update all store sections
         if (template.metadata) state.setMetadata(template.metadata);
         if (template.problem) state.setProblem(template.problem);
         if (template.context) state.setContext(template.context);
@@ -65,6 +64,10 @@ export function SaveLoad() {
   };
 
   const handleLoadExample = () => {
+    if (!confirm('Möchten Sie das Beispiel-Template laden? Aktuelle Änderungen gehen verloren.')) {
+      return;
+    }
+
     state.setMetadata(exampleTemplate.metadata);
     state.setProblem(exampleTemplate.problem);
     state.setContext(exampleTemplate.context);
@@ -80,6 +83,10 @@ export function SaveLoad() {
   };
 
   const handleClear = () => {
+    if (!confirm('Möchten Sie wirklich alle Daten löschen?')) {
+      return;
+    }
+    
     state.setMetadata({ title: '', description: '', keywords: [], author: '', version: '1.0' });
     state.setProblem({ problem_description: '', learning_goals: [], didactic_keywords: [] });
     state.setContext({ target_group: '', subject: '', educational_level: '', prerequisites: '', time_frame: '' });
@@ -99,10 +106,10 @@ export function SaveLoad() {
   };
 
   return (
-    <div className="flex justify-end space-x-4">
-      <label className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer flex items-center gap-2">
-        <DocumentArrowUpIcon className="w-5 h-5" />
-        Vorlage laden
+    <div className="flex space-x-2">
+      <label className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer flex items-center gap-1 text-sm">
+        <DocumentArrowUpIcon className="w-4 h-4" />
+        Template laden
         <input
           type="file"
           accept=".json"
@@ -113,34 +120,34 @@ export function SaveLoad() {
 
       <button
         onClick={handleSave}
-        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center gap-2"
+        className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center gap-1 text-sm"
       >
-        <DocumentArrowDownIcon className="w-5 h-5" />
-        Vorlage speichern
+        <DocumentArrowDownIcon className="w-4 h-4" />
+        Template speichern
       </button>
 
       <button
         onClick={handleGeneratePDF}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
+        className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-1 text-sm"
       >
-        <DocumentTextIcon className="w-5 h-5" />
+        <DocumentTextIcon className="w-4 h-4" />
         PDF generieren
       </button>
 
       <button
         onClick={handleLoadExample}
-        className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center gap-2"
+        className="px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center gap-1 text-sm"
       >
-        <DocumentPlusIcon className="w-5 h-5" />
+        <DocumentPlusIcon className="w-4 h-4" />
         Beispiel laden
       </button>
 
       <button
         onClick={handleClear}
-        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-2"
+        className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-1 text-sm"
       >
-        <TrashIcon className="w-5 h-5" />
-        Alles löschen
+        <TrashIcon className="w-4 h-4" />
+        Einträge löschen
       </button>
     </div>
   );

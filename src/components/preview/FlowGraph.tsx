@@ -6,7 +6,8 @@ import ReactFlow, {
   Controls,
   useNodesState,
   useEdgesState,
-  ConnectionMode
+  ConnectionMode,
+  Panel
 } from 'reactflow';
 import { useTemplateStore } from '../../store/templateStore';
 import { createNodes } from './createNodes';
@@ -16,14 +17,6 @@ import 'reactflow/dist/style.css';
 interface NodeData {
   label: JSX.Element;
 }
-
-const createNodeLabel = (content: string[]) => (
-  <div className="p-2 text-sm">
-    {content.map((line, i) => (
-      <div key={i} className={i === 0 ? "font-bold mb-1" : "text-xs mb-1"}>{line}</div>
-    ))}
-  </div>
-);
 
 export const FlowGraph: FC = () => {
   const state = useTemplateStore();
@@ -71,5 +64,3 @@ export const FlowGraph: FC = () => {
     </div>
   );
 };
-
-export default FlowGraph;
