@@ -10,8 +10,30 @@ export default defineConfig({
     }
   },
   server: {
-    fs: {
-      strict: false
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request:', req.method, req.url);
+            // Log request headers
+            console.log('Request Headers:', proxyReq.getHeaders());
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('Received Response:', {
+              statusCode: proxyRes.statusCode,
+              url: req.url,
+              headers: proxyRes.headers
+            });
+          });
+        }
+      }
     }
   },
   build: {

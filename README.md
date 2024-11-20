@@ -17,13 +17,18 @@ npm install
 
 ## Erste Schritte
 
-Entwicklungsserver starten:
+### Entwicklungsserver mit Proxy starten:
 
 ```bash
+# Terminal 1: Proxy-Server starten
+npm run proxy
+
+# Terminal 2: Entwicklungsserver starten
 npm run dev
 ```
 
 Die Anwendung ist dann unter `http://localhost:5173` verfügbar.
+Der Proxy-Server läuft auf Port 3001 und ermöglicht den Zugriff auf die WLO-API.
 
 ## Funktionen
 
