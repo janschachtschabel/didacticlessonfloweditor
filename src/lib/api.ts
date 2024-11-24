@@ -6,7 +6,8 @@ export async function processTemplate(
   template: Template,
   input: string,
   model: string,
-  apiKey: string
+  apiKey: string,
+  signal?: AbortSignal
 ): Promise<Template> {
   const client = new OpenAI({ 
     apiKey,
@@ -86,26 +87,42 @@ ${input}
 Bitte geben Sie das vervollständigte Template als JSON-Objekt zurück.
 `;
 
-  const response = await client.chat.completions.create({
-    model,
-    messages: [
-      {
-        role: 'system',
-        content: 'Sie sind ein erfahrener didaktischer Assistent, der vielfältige und flexible Lernszenarien mit allen erforderlichen Details erstellt.'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ],
-    temperature: 0.8,
-    response_format: { type: 'json_object' }
+  // Create a promise that rejects when the signal is aborted
+  const abortPromise = new Promise((_, reject) => {
+    signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
   });
 
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error('Keine Antwort vom KI-Modell');
-  }
+  try {
+    // Race between the API call and abort signal
+    const result = await Promise.race([
+      client.chat.completions.create({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: 'Sie sind ein erfahrener didaktischer Assistent, der vielfältige und flexible Lernszenarien mit allen erforderlichen Details erstellt.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        response_format: { type: 'json_object' }
+      }),
+      abortPromise
+    ]);
 
-  return JSON.parse(content);
+    // If we got here, the API call completed successfully
+    if ('choices' in result && result.choices[0].message.content) {
+      return JSON.parse(result.choices[0].message.content);
+    }
+
+    throw new Error('Keine Antwort vom KI-Modell');
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
+    throw error;
+  }
 }

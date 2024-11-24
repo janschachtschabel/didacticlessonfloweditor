@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
 import { generateFilterCriteria } from '../lib/filterUtils';
@@ -7,9 +7,7 @@ import { SaveLoad } from '../components/SaveLoad';
 
 const AI_MODELS = [
   { id: 'gpt-4o-mini', name: 'GPT-4O Mini' },
-  { id: 'gpt-4o', name: 'GPT-4O' },
-  { id: 'gpt-4-1106-preview', name: 'GPT-4 Turbo' },
-  { id: 'gpt-4', name: 'GPT-4' },
+  { id: 'gpt-4o', name: 'GPT-4O' }
 ];
 
 const FILTER_OPTIONS = [
@@ -32,6 +30,7 @@ export function AIFilterAgent() {
     FILTER_PROPERTIES.CONTENT_TYPE,
     FILTER_PROPERTIES.DISCIPLINE
   ]);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const currentTemplate = {
     metadata: state.metadata,
@@ -61,6 +60,15 @@ export function AIFilterAgent() {
     });
   };
 
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setError('Verarbeitung wurde abgebrochen');
+      addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      setLoading(false);
+    }
+  };
+
   const handleProcess = async () => {
     if (!apiKey) {
       setError('Bitte geben Sie Ihren OpenAI API-Schlüssel ein');
@@ -71,6 +79,7 @@ export function AIFilterAgent() {
     setError(null);
     setSuccess(false);
     setStatus([]);
+    abortControllerRef.current = new AbortController();
 
     try {
       let updatedEnvironments = [...currentTemplate.environments];
@@ -179,10 +188,17 @@ export function AIFilterAgent() {
       setSuccess(true);
       addStatus(`\n✅ Verarbeitung abgeschlossen! ${totalProcessed} Ressourcen wurden mit Filterkriterien versehen.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
-      addStatus('\n❌ Fehler bei der Verarbeitung');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Verarbeitung wurde abgebrochen');
+        addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
+        setError(errorMessage);
+        addStatus(`\n❌ Fehler bei der Verarbeitung: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -192,6 +208,11 @@ export function AIFilterAgent() {
         <h1 className="text-2xl font-bold">KI Filter</h1>
         <SaveLoad />
       </div>
+
+      <p className="text-sm text-gray-600">
+        Der KI-Filter-Agent hilft Ihnen dabei, passende Filterkriterien für Ihre Lernressourcen zu generieren.
+        Diese Kriterien werden später verwendet, um relevante Inhalte aus der WLO-Datenbank zu finden.
+      </p>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -223,6 +244,19 @@ export function AIFilterAgent() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
+          Aktuelles Template
+        </label>
+        <div className="h-[20vh] border rounded-lg overflow-hidden bg-gray-50">
+          <Editor
+            value={JSON.stringify(currentTemplate, null, 2)}
+            onChange={() => {}}
+            readOnly
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Zu generierende Filtertypen
         </label>
         <div className="space-y-2">
@@ -237,19 +271,6 @@ export function AIFilterAgent() {
               <span>{filter.label}</span>
             </label>
           ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Aktuelles Template
-        </label>
-        <div className="h-[40vh] border rounded-lg overflow-hidden bg-gray-50">
-          <Editor
-            value={JSON.stringify(currentTemplate, null, 2)}
-            onChange={() => {}}
-            readOnly
-          />
         </div>
       </div>
 
@@ -276,7 +297,15 @@ export function AIFilterAgent() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
+        {loading && (
+          <button
+            onClick={handleCancel}
+            className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
+          >
+            Abbrechen
+          </button>
+        )}
         <button
           onClick={handleProcess}
           disabled={loading}

@@ -72,6 +72,17 @@ export function Actors() {
         <SaveLoad />
       </div>
 
+      <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-lg shadow-sm mb-8">
+        <p className="text-teal-900">
+          Definieren Sie hier die verschiedenen Akteure Ihres Unterrichtsszenarios. Dies können Einzelpersonen (z.B. Lehrkräfte), 
+          Gruppen (z.B. Lernende) oder auch KI-Systeme sein. Für jeden Akteur können Sie detaillierte Profile mit Lernvoraussetzungen, 
+          Kompetenzen und spezifischen Bedürfnissen erstellen. Diese Informationen ermöglichen es, personalisierte und inklusive 
+          Unterrichtsabläufe zu gestalten, die optimal auf die Beteiligten abgestimmt sind. Definieren Sie sowohl die lehrenden 
+          als auch die lernenden Akteure - von der einzelnen Lehrkraft bis hin zu verschiedenen Lerngruppen mit unterschiedlichen 
+          Voraussetzungen.
+        </p>
+      </div>
+
       <div className="space-y-6">
         {actors.map((actor) => (
           <div key={actor.id}>

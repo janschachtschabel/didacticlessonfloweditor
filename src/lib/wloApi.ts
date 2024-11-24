@@ -1,22 +1,6 @@
-import { z } from 'zod';
+import axios from 'axios';
 
-const WLONodeSchema = z.object({
-  properties: z.record(z.array(z.string())).optional(),
-  preview: z.object({
-    url: z.string().optional()
-  }).optional()
-});
-
-const WLOResponseSchema = z.object({
-  nodes: z.array(WLONodeSchema).optional(),
-  pagination: z.object({
-    total: z.number(),
-    from: z.number(),
-    count: z.number()
-  }).optional()
-});
-
-export type WLOSearchParams = {
+export interface WLOSearchParams {
   properties: string[];
   values: string[];
   maxItems?: number;
@@ -24,9 +8,12 @@ export type WLOSearchParams = {
   propertyFilter?: string;
   endpoint: string;
   combineMode?: 'OR' | 'AND';
-};
+  signal?: AbortSignal;
+}
 
-const TIMEOUT = 60000; // 60 seconds timeout
+function getProxyUrl(): string {
+  return 'http://localhost:3001/proxy';
+}
 
 export async function searchWLO({
   properties,
@@ -35,12 +22,14 @@ export async function searchWLO({
   skipCount = 0,
   propertyFilter = '-all-',
   endpoint,
-  combineMode = 'OR'
+  combineMode = 'AND',
+  signal
 }: WLOSearchParams) {
   const params = new URLSearchParams();
   params.append('contentType', 'FILES');
   params.append('combineMode', combineMode);
   
+  // Add properties and values individually to avoid comma issues
   properties.forEach((prop) => {
     params.append('property', prop);
   });
@@ -53,59 +42,20 @@ export async function searchWLO({
   params.append('propertyFilter', propertyFilter);
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+    const proxyUrl = getProxyUrl();
+    const targetUrl = `${endpoint}/search/v1/custom/-home-?${params.toString()}`;
+    const fullUrl = `${proxyUrl}?url=${encodeURIComponent(targetUrl)}`;
 
-    console.log('Making WLO API request:', {
-      properties,
-      values,
-      maxItems,
-      skipCount,
-      propertyFilter,
-      combineMode,
-      endpoint
-    });
+    console.log('Making WLO request:', fullUrl);
 
-    // Direkter API-Aufruf
-    const response = await fetch(`${endpoint}/search/v1/custom/-home-?${params.toString()}`, {
-      method: 'GET',
+    const response = await axios.get(fullUrl, {
       headers: {
         'Accept': 'application/json'
       },
-      signal: controller.signal
+      signal
     });
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('WLO API Response:', data);
-
-    const parsed = WLOResponseSchema.safeParse(data);
-    if (!parsed.success) {
-      console.error('WLO API Response Parse Error:', parsed.error);
-      throw new Error(`Invalid response format: ${parsed.error.message}`);
-    }
-
-    const nodes = parsed.data.nodes?.map(node => {
-      const nodeId = node.properties?.['sys:node-uuid']?.[0];
-      if (!nodeId) {
-        console.warn('Node missing sys:node-uuid:', node);
-        return null;
-      }
-      return {
-        ...node,
-        nodeId
-      };
-    }).filter((node): node is NonNullable<typeof node> => node !== null) || [];
-
-    return {
-      ...parsed.data,
-      nodes
-    };
+    return response.data;
   } catch (error) {
     console.error('Error searching WLO:', error);
     throw error;

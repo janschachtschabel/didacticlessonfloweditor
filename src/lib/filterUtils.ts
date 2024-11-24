@@ -14,12 +14,7 @@ interface FilterContext {
   activityName: string;
   roleName: string;
   taskDescription: string;
-  template: any; // Full template context
-}
-
-interface FilterSelectionResult {
-  germanLabel: string;
-  uri: string;
+  template: any;
 }
 
 export async function generateFilterCriteria(
@@ -35,59 +30,29 @@ export async function generateFilterCriteria(
 
   const filterCriteria: Record<string, string> = {};
 
-  // Process each selected filter type
   for (const filterType of selectedFilters) {
     addStatus(`Processing filter type: ${filterType}`);
 
-    let result: FilterSelectionResult | null = null;
-
     switch (filterType) {
       case FILTER_PROPERTIES.TITLE:
-        // For title, we'll use the context to generate a search term
         const searchTerm = await generateSearchTerm(client, context);
         filterCriteria[filterType] = searchTerm;
-        addStatus(`Generated search term: ${searchTerm}`);
+        addStatus(`Generated search term: "${searchTerm}"`);
         break;
 
       case FILTER_PROPERTIES.CONTENT_TYPE:
-        result = await selectFromMapping(
-          client, 
-          context,
-          Object.keys(INHALTSTYP_MAPPING),
-          "content type",
-          addStatus
-        );
-        if (result) {
-          filterCriteria[filterType] = result.uri;
-          addStatus(`Selected content type: ${result.germanLabel} -> ${result.uri}`);
-        }
-        break;
-
-      case FILTER_PROPERTIES.EDUCATIONAL_CONTEXT:
-        result = await selectFromMapping(
-          client,
-          context,
-          Object.keys(BILDUNGSSTUFE_MAPPING),
-          "educational level",
-          addStatus
-        );
-        if (result) {
-          filterCriteria[filterType] = result.uri;
-          addStatus(`Selected educational level: ${result.germanLabel} -> ${result.uri}`);
+        const contentType = await selectContentType(client, context, addStatus);
+        if (contentType) {
+          filterCriteria[filterType] = contentType.uri;
+          addStatus(`Selected content type: ${contentType.germanLabel} -> ${contentType.uri}`);
         }
         break;
 
       case FILTER_PROPERTIES.DISCIPLINE:
-        result = await selectFromMapping(
-          client,
-          context,
-          Object.keys(FACH_MAPPING),
-          "discipline",
-          addStatus
-        );
-        if (result) {
-          filterCriteria[filterType] = result.uri;
-          addStatus(`Selected discipline: ${result.germanLabel} -> ${result.uri}`);
+        const discipline = await selectDiscipline(client, context, addStatus);
+        if (discipline) {
+          filterCriteria[filterType] = discipline.uri;
+          addStatus(`Selected discipline: ${discipline.germanLabel} -> ${discipline.uri}`);
         }
         break;
     }
@@ -102,8 +67,8 @@ Generate a SINGLE, CONCISE search term (1-2 words maximum) that best represents 
 
 Context:
 Item: ${context.itemName} (${context.itemType})
-Activity: ${context.activityName}
-Task: ${context.taskDescription}
+Subject: ${context.subject}
+Educational Level: ${context.educationalLevel}
 
 IMPORTANT:
 - Return ONLY the search term
@@ -114,18 +79,12 @@ IMPORTANT:
 
 Example good responses:
 - "Addition"
-- "Photosynthese"
-- "Pythagoras"
-- "Bruchrechnung"
-
-Example bad responses:
-- "Material für Addition" (too long)
-- "Die Photosynthese lernen" (too verbose)
-- "Mathematische Übungen" (too generic)
-`;
+- "Zahlenbingo"
+- "Taschenrechner"
+- "Mathematikförderung"`;
 
   const response = await client.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o-mini",
     messages: [
       { role: "system", content: "You are a precise search term generator that returns only single concepts." },
       { role: "user", content: prompt }
@@ -137,34 +96,51 @@ Example bad responses:
   return response.choices[0].message.content?.trim() || context.itemName;
 }
 
-async function selectFromMapping(
+async function selectContentType(
   client: OpenAI,
   context: FilterContext,
-  options: string[],
-  filterName: string,
   addStatus: (message: string) => void
-): Promise<FilterSelectionResult | null> {
+) {
+  addStatus('Analyzing context to select content type...');
+
+  // Map common material types to content types
+  const materialTypeMap: Record<string, string> = {
+    'Spielmaterial': 'Lernspiel',
+    'Karten': 'Arbeitsblatt',
+    'Hardware': 'Tool',
+    'Software': 'Tool',
+    'Förderung': 'Bildungsangebot'
+  };
+
+  // If we have a direct mapping, use it
+  if (context.itemType === 'material' && materialTypeMap[context.material_type]) {
+    const mappedType = materialTypeMap[context.material_type];
+    if (Object.keys(INHALTSTYP_MAPPING).includes(mappedType)) {
+      addStatus(`Direct mapping found: ${context.material_type} -> ${mappedType}`);
+      return {
+        germanLabel: mappedType,
+        uri: INHALTSTYP_MAPPING[mappedType as keyof typeof INHALTSTYP_MAPPING]
+      };
+    }
+  }
+
+  // Otherwise, use AI to select content type
   const prompt = `
-Based on the following context, select the most appropriate ${filterName} from the given options.
+Based on the following context, select the most appropriate content type from the given options.
 
 Context:
-- Item: ${context.itemName} (${context.itemType})
-- Activity: ${context.activityName}
-- Role: ${context.roleName}
-- Task: ${context.taskDescription}
-- Educational Level: ${context.educationalLevel}
-- Subject: ${context.subject}
+Item: ${context.itemName}
+Type: ${context.itemType}
+Subject: ${context.subject}
+Educational Level: ${context.educationalLevel}
 
 Available options:
-${options.join('\n')}
+${Object.keys(INHALTSTYP_MAPPING).join('\n')}
 
-Return only the exact name of the most appropriate option from the list.
-`;
-
-  addStatus(`Analyzing context to select ${filterName}...`);
+Return only the exact name of the most appropriate option from the list.`;
 
   const response = await client.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o-mini",
     messages: [
       { role: "system", content: "You are a helpful assistant that selects appropriate educational metadata values." },
       { role: "user", content: prompt }
@@ -175,27 +151,67 @@ Return only the exact name of the most appropriate option from the list.
 
   const selectedLabel = response.choices[0].message.content?.trim();
   
-  if (!selectedLabel || !options.includes(selectedLabel)) {
-    addStatus(`Could not determine appropriate ${filterName}`);
+  if (!selectedLabel || !Object.keys(INHALTSTYP_MAPPING).includes(selectedLabel)) {
+    addStatus('Could not determine appropriate content type');
     return null;
-  }
-
-  // Map the selected German label to URI
-  let uri = '';
-  switch (filterName) {
-    case "content type":
-      uri = INHALTSTYP_MAPPING[selectedLabel as keyof typeof INHALTSTYP_MAPPING];
-      break;
-    case "educational level":
-      uri = BILDUNGSSTUFE_MAPPING[selectedLabel as keyof typeof BILDUNGSSTUFE_MAPPING];
-      break;
-    case "discipline":
-      uri = FACH_MAPPING[selectedLabel as keyof typeof FACH_MAPPING];
-      break;
   }
 
   return {
     germanLabel: selectedLabel,
-    uri
+    uri: INHALTSTYP_MAPPING[selectedLabel as keyof typeof INHALTSTYP_MAPPING]
+  };
+}
+
+async function selectDiscipline(
+  client: OpenAI,
+  context: FilterContext,
+  addStatus: (message: string) => void
+) {
+  addStatus('Analyzing context to select discipline...');
+
+  // If subject is directly in mapping, use it
+  if (Object.keys(FACH_MAPPING).includes(context.subject)) {
+    addStatus(`Direct mapping found for subject: ${context.subject}`);
+    return {
+      germanLabel: context.subject,
+      uri: FACH_MAPPING[context.subject as keyof typeof FACH_MAPPING]
+    };
+  }
+
+  // Otherwise, use AI to select discipline
+  const prompt = `
+Based on the following context, select the most appropriate discipline from the given options.
+
+Context:
+Item: ${context.itemName}
+Type: ${context.itemType}
+Subject: ${context.subject}
+Educational Level: ${context.educationalLevel}
+
+Available options:
+${Object.keys(FACH_MAPPING).join('\n')}
+
+Return only the exact name of the most appropriate option from the list.`;
+
+  const response = await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: "You are a helpful assistant that selects appropriate educational metadata values." },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.7,
+    max_tokens: 100
+  });
+
+  const selectedLabel = response.choices[0].message.content?.trim();
+  
+  if (!selectedLabel || !Object.keys(FACH_MAPPING).includes(selectedLabel)) {
+    addStatus('Could not determine appropriate discipline');
+    return null;
+  }
+
+  return {
+    germanLabel: selectedLabel,
+    uri: FACH_MAPPING[selectedLabel as keyof typeof FACH_MAPPING]
   };
 }

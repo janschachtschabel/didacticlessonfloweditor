@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
 import { processResources } from '../components/wlo/ResourceProcessor';
@@ -17,20 +17,48 @@ export function WLOAgent() {
   const [processing, setProcessing] = useState(false);
   const [endpoint, setEndpoint] = useState<keyof typeof API_ENDPOINTS>('PRODUCTION');
   const [maxItems, setMaxItems] = useState(DEFAULT_MAX_ITEMS);
-  const [combineMode, setCombineMode] = useState<'OR' | 'AND'>('OR');
+  const [combineMode, setCombineMode] = useState<'OR' | 'AND'>('AND');
+  const [useNetlifyProxy, setUseNetlifyProxy] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Set environment variable for Netlify proxy
+  if (typeof window !== 'undefined') {
+    (window as any).process = {
+      ...(window as any).process,
+      env: {
+        ...(window as any).process?.env,
+        NETLIFY: useNetlifyProxy,
+        WLO_PROXY_ENABLED: useNetlifyProxy ? 'true' : 'false'
+      }
+    };
+  }
 
   const addStatus = (message: string) => {
     setStatus(prev => [...prev, message]);
   };
 
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      setProcessing(false);
+    }
+  };
+
   const handleProcess = async () => {
     setProcessing(true);
     setStatus([]);
+    abortControllerRef.current = new AbortController();
 
     try {
       const environments = [...state.environments];
       
       for (const env of environments) {
+        // Check if process was aborted
+        if (abortControllerRef.current.signal.aborted) {
+          return;
+        }
+
         addStatus(`\n📂 Verarbeite Lernumgebung: ${env.name}`);
 
         // Process materials
@@ -43,7 +71,8 @@ export function WLOAgent() {
           {
             endpoint: API_ENDPOINTS[endpoint],
             maxItems,
-            combineMode
+            combineMode,
+            signal: abortControllerRef.current.signal
           }
         );
 
@@ -57,7 +86,8 @@ export function WLOAgent() {
           {
             endpoint: API_ENDPOINTS[endpoint],
             maxItems,
-            combineMode
+            combineMode,
+            signal: abortControllerRef.current.signal
           }
         );
 
@@ -71,7 +101,8 @@ export function WLOAgent() {
           {
             endpoint: API_ENDPOINTS[endpoint],
             maxItems,
-            combineMode
+            combineMode,
+            signal: abortControllerRef.current.signal
           }
         );
       }
@@ -79,9 +110,14 @@ export function WLOAgent() {
       state.setEnvironments(environments);
       addStatus('\n✅ Verarbeitung erfolgreich abgeschlossen');
     } catch (error) {
-      addStatus(`\n❌ Fehler bei der Verarbeitung: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+      if (error instanceof Error && error.name === 'AbortError') {
+        addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      } else {
+        addStatus(`\n❌ Fehler bei der Verarbeitung: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+      }
     } finally {
       setProcessing(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -141,9 +177,24 @@ export function WLOAgent() {
               onChange={(e) => setCombineMode(e.target.value as 'OR' | 'AND')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
-              <option value="OR">ODER</option>
               <option value="AND">UND</option>
+              <option value="OR">ODER</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">CORS-Proxy</label>
+            <div className="mt-1 flex items-center">
+              <input
+                type="checkbox"
+                checked={useNetlifyProxy}
+                onChange={(e) => setUseNetlifyProxy(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="ml-2">Netlify CORS-Fix aktivieren</span>
+            </div>
+            <p className="mt-1 text-sm text-gray-500">
+              {useNetlifyProxy ? 'Verwendet Netlify Functions als Proxy' : 'Verwendet lokalen Proxy-Server'}
+            </p>
           </div>
         </div>
       </div>
@@ -171,7 +222,15 @@ export function WLOAgent() {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
+        {processing && (
+          <button
+            onClick={handleCancel}
+            className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
+          >
+            Abbrechen
+          </button>
+        )}
         <button
           onClick={handleProcess}
           disabled={processing}

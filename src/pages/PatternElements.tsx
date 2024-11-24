@@ -158,8 +158,17 @@ export function PatternElements() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
-        <h1 className="text-2xl font-bold">Patternelemente</h1>
+        <h1 className="text-2xl font-bold">Didaktische Grundlagen</h1>
         <SaveLoad />
+      </div>
+
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg shadow-sm mb-8">
+        <p className="text-purple-900">
+          Die didaktischen Grundlagen bilden das Fundament Ihres Unterrichtsentwurfs. Hier definieren Sie das pädagogische Problem, 
+          den Kontext und die angestrebte Lösung. Beschreiben Sie die Herausforderungen, die Sie addressieren möchten, 
+          die konkreten Lernziele und wie diese durch Ihren didaktischen Ansatz erreicht werden sollen. 
+          Diese Grundlagen helfen dabei, ein kohärentes und zielgerichtetes Lehr-Lern-Szenario zu entwickeln.
+        </p>
       </div>
 
       {/* Problem Section */}

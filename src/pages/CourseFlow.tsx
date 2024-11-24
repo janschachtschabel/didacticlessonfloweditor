@@ -147,6 +147,126 @@ export function CourseFlow() {
         <SaveLoad />
       </div>
 
+      <div className="grid grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-blue-900 mb-4">Elemente des Lernablaufs</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-blue-800">Lernsequenzen</h4>
+              <p className="text-blue-700">
+                Übergeordnete methodische Einheiten, die meist eine gesamte Lerneinheit umfassen. 
+                Sie können flexibel verknüpft werden für Methodenwechsel oder parallele Lernpfade.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-blue-800">Phasen</h4>
+              <p className="text-blue-700">
+                Einzelne Abschnitte innerhalb einer Sequenz. Sie laufen immer nacheinander ab und 
+                müssen abgeschlossen sein, bevor die nächste Phase beginnt.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-blue-800">Aktivitäten</h4>
+              <p className="text-blue-700">
+                Die kleinsten Einheiten im Prozessablauf. Sie können frei kombiniert werden und 
+                enthalten die konkreten Lernhandlungen.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-blue-800">Rollen</h4>
+              <p className="text-blue-700">
+                Beschreiben die Aufgaben der Akteure in den Aktivitäten und sind mit Lernumgebungen 
+                und Ressourcen verknüpft.
+              </p>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-medium text-blue-800">Ablaufoptionen</h4>
+              
+              <div className="mt-2">
+                <p className="text-blue-700 font-medium">Für Lernsequenzen:</p>
+                <ul className="list-disc list-inside text-blue-600 ml-2">
+                  <li>Sequenziell (nacheinander)</li>
+                  <li>Parallel (gleichzeitig)</li>
+                  <li>Bedingt (mit Bedingung)</li>
+                </ul>
+              </div>
+
+              <div className="mt-2">
+                <p className="text-blue-700 font-medium">Für Phasen:</p>
+                <ul className="list-disc list-inside text-blue-600 ml-2">
+                  <li>Sequenziell (nacheinander)</li>
+                </ul>
+              </div>
+
+              <div className="mt-2">
+                <p className="text-blue-700 font-medium">Für Aktivitäten:</p>
+                <ul className="list-disc list-inside text-blue-600 ml-2">
+                  <li>Sequenziell</li>
+                  <li>Parallel</li>
+                  <li>Bedingt</li>
+                  <li>Verzweigung</li>
+                  <li>Wiederholung</li>
+                  <li>Optional</li>
+                  <li>Feedback-Schleife</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-emerald-900 mb-4">Beispiel: Galeriemethode</h3>
+          
+          <div className="space-y-4">
+            <div className="bg-white bg-opacity-50 p-4 rounded-lg">
+              <h4 className="font-medium text-emerald-800">Phase 1: Gruppenbildung</h4>
+              <div className="mt-2 space-y-2">
+                <p className="text-emerald-700 font-medium">Aktivität: Teams bilden</p>
+                
+                <div className="ml-4">
+                  <div className="text-emerald-700">
+                    <p className="font-medium">Rolle: Lehrkraft</p>
+                    <ul className="list-disc list-inside ml-2 text-sm">
+                      <li>Akteur: Frau Schmidt</li>
+                      <li>Lernumgebung: Klassenzimmer</li>
+                      <li>Ressourcen: Gruppeneinteilungskarten</li>
+                    </ul>
+                  </div>
+
+                  <div className="mt-2 text-emerald-700">
+                    <p className="font-medium">Rolle: Lernende</p>
+                    <ul className="list-disc list-inside ml-2 text-sm">
+                      <li>Akteur: Hauptlerngruppe</li>
+                      <li>Lernumgebung: Klassenzimmer</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="bg-white bg-opacity-30 p-2 rounded">
+                <p className="text-emerald-800">Phase 2: Input</p>
+              </div>
+              <div className="bg-white bg-opacity-30 p-2 rounded">
+                <p className="text-emerald-800">Phase 3: Aufgabenstellung</p>
+              </div>
+              <div className="bg-white bg-opacity-30 p-2 rounded">
+                <p className="text-emerald-800">Phase 4: Gruppenarbeit & Ausstellung</p>
+              </div>
+              <div className="bg-white bg-opacity-30 p-2 rounded">
+                <p className="text-emerald-800">Phase 5: Auswertung</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-6">
         {solution.didactic_template?.learning_sequences?.map((sequence, sequenceIndex) => (
           <div key={sequence.sequence_id} className="bg-white p-6 rounded-lg shadow">

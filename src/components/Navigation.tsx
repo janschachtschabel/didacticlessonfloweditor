@@ -1,25 +1,29 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
+  HomeIcon,
   Cog6ToothIcon,
   PuzzlePieceIcon,
   UsersIcon,
   BuildingLibraryIcon,
   AcademicCapIcon,
   BoltIcon,
-  FunnelIcon,
-  GlobeAltIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
   { 
-    path: '/', 
-    label: 'Allgemeine Einstellungen',
+    path: '/',
+    label: 'Start',
+    icon: HomeIcon
+  },
+  { 
+    path: '/general-settings', 
+    label: 'Allgemeines',
     icon: Cog6ToothIcon
   },
   { 
     path: '/pattern-elements', 
-    label: 'Patternelemente',
+    label: 'Didaktische Grundlagen',
     icon: PuzzlePieceIcon
   },
   { 
@@ -46,16 +50,6 @@ const navItems = [
     path: '/ai-flow-agent', 
     label: 'KI Ablauf',
     icon: BoltIcon
-  },
-  { 
-    path: '/ai-filter-agent', 
-    label: 'KI Filter',
-    icon: FunnelIcon
-  },
-  { 
-    path: '/wlo-agent', 
-    label: 'WLO Inhalte',
-    icon: GlobeAltIcon
   }
 ];
 

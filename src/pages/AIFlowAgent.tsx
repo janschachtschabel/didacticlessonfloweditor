@@ -1,24 +1,48 @@
-import { useState } from 'react';
+import React from 'react';
+import { useState, useRef } from 'react';
 import { useTemplateStore } from '../store/templateStore';
 import { Editor } from '../components/Editor';
-import { processTemplate } from '../lib/api';
 import { SaveLoad } from '../components/SaveLoad';
+import { generateTemplate } from '../lib/templateGenerator';
+import { generateFilterCriteria } from '../lib/filterUtils';
+import { processResources } from '../components/wlo/ResourceProcessor';
 
 const AI_MODELS = [
-  { id: 'gpt-4o-mini', name: 'GPT-4O Mini' },
-  { id: 'gpt-4o', name: 'GPT-4O' },
-  { id: 'gpt-4-1106-preview', name: 'GPT-4 Turbo' },
-  { id: 'gpt-4', name: 'GPT-4' },
+  { id: 'gpt-4o-mini', name: 'GPT-4O Mini' }
 ];
 
-export function AIFlowAgent() {
+const API_ENDPOINTS = {
+  PRODUCTION: 'https://redaktion.openeduhub.net/edu-sharing/rest',
+  STAGING: 'https://repository.staging.openeduhub.net/edu-sharing/rest'
+};
+
+const METADATA_OPTIONS = [
+  { id: 'cclom:title', label: 'Titel' },
+  { id: 'ccm:oeh_lrt_aggregated', label: 'Inhaltstyp' },
+  { id: 'ccm:taxonid', label: 'Fach' },
+  { id: 'ccm:educationalcontext', label: 'Bildungskontext' }
+];
+
+const AIFlowAgent: React.FC = () => {
   const state = useTemplateStore();
   const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState('gpt-4o-mini');
+  const [model] = useState('gpt-4o-mini');
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [status, setStatus] = useState<string[]>([]);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Process selection states
+  const [useKIFilter, setUseKIFilter] = useState(true);
+  const [useWLOInhalte, setUseWLOInhalte] = useState(true);
+  const [selectedMetadata, setSelectedMetadata] = useState(['cclom:title', 'ccm:oeh_lrt_aggregated', 'ccm:taxonid']);
+
+  // WLO options
+  const [endpoint, setEndpoint] = useState<keyof typeof API_ENDPOINTS>('PRODUCTION');
+  const [maxItems, setMaxItems] = useState(5);
+  const [combineMode, setCombineMode] = useState<'OR' | 'AND'>('AND');
 
   const currentTemplate = {
     metadata: state.metadata,
@@ -35,6 +59,27 @@ export function AIFlowAgent() {
     environments: state.environments
   };
 
+  const addStatus = (message: string) => {
+    setStatus(prev => [...prev, message]);
+  };
+
+  const handleMetadataToggle = (metadataId: string) => {
+    setSelectedMetadata(prev => 
+      prev.includes(metadataId) 
+        ? prev.filter(id => id !== metadataId)
+        : [...prev, metadataId]
+    );
+  };
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setError('Verarbeitung wurde abgebrochen');
+      addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      setLoading(false);
+    }
+  };
+
   const handleProcess = async () => {
     if (!apiKey) {
       setError('Bitte geben Sie Ihren OpenAI API-Schlüssel ein');
@@ -49,29 +94,263 @@ export function AIFlowAgent() {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setStatus([]);
+    abortControllerRef.current = new AbortController();
 
     try {
-      const result = await processTemplate(currentTemplate, userInput, model, apiKey);
-      
-      state.setMetadata(result.metadata);
-      state.setProblem(result.problem);
-      state.setContext(result.context);
-      state.setInfluenceFactors(result.influence_factors);
-      state.setSolution(result.solution);
-      state.setConsequences(result.consequences);
-      state.setImplementationNotes(result.implementation_notes);
-      state.setRelatedPatterns(result.related_patterns);
-      state.setFeedback(result.feedback);
-      state.setSources(result.sources);
-      state.setActors(result.actors);
-      state.setEnvironments(result.environments);
+      let updatedTemplate = currentTemplate;
+
+      // Step 1: Generate template with AI
+      if (true) { // Always run template generation
+        addStatus('🤖 Starte KI Ablauf Verarbeitung...');
+        const generatedTemplate = await generateTemplate(
+          currentTemplate,
+          userInput,
+          model,
+          apiKey,
+          addStatus
+        );
+
+        // Update template
+        updatedTemplate = generatedTemplate;
+        
+        // Update store
+        state.setMetadata(generatedTemplate.metadata);
+        state.setProblem(generatedTemplate.problem);
+        state.setContext(generatedTemplate.context);
+        state.setInfluenceFactors(generatedTemplate.influence_factors);
+        state.setSolution(generatedTemplate.solution);
+        state.setConsequences(generatedTemplate.consequences);
+        state.setImplementationNotes(generatedTemplate.implementation_notes);
+        state.setRelatedPatterns(generatedTemplate.related_patterns);
+        state.setFeedback(generatedTemplate.feedback);
+        state.setSources(generatedTemplate.sources);
+        state.setActors(generatedTemplate.actors);
+        state.setEnvironments(generatedTemplate.environments);
+
+        addStatus('✅ KI Ablauf Verarbeitung erfolgreich abgeschlossen');
+      }
+
+      // Step 2: KI Filter Generation
+      if (useKIFilter) {
+        addStatus('\n🔍 Starte KI Filter Verarbeitung...');
+        
+        let updatedEnvironments = [...updatedTemplate.environments];
+
+        for (let envIndex = 0; envIndex < updatedEnvironments.length; envIndex++) {
+          const env = updatedEnvironments[envIndex];
+          addStatus(`\n📂 Verarbeite Lernumgebung: ${env.name}`);
+
+          // Process materials
+          for (let i = 0; i < env.materials.length; i++) {
+            const material = env.materials[i];
+            addStatus(`\n🔍 Verarbeite Material: ${material.name}`);
+            
+            const filterContext = {
+              itemName: material.name,
+              itemType: 'material' as const,
+              material_type: material.material_type,
+              educationalLevel: updatedTemplate.context.educational_level,
+              subject: updatedTemplate.context.subject,
+              activityName: '',
+              roleName: '',
+              taskDescription: '',
+              template: updatedTemplate
+            };
+
+            try {
+              const criteria = await generateFilterCriteria(
+                filterContext,
+                apiKey,
+                selectedMetadata,
+                addStatus
+              );
+
+              updatedEnvironments[envIndex].materials[i] = {
+                ...material,
+                filter_criteria: criteria,
+                source: 'filter'
+              };
+            } catch (error) {
+              addStatus(`❌ Fehler beim Verarbeiten von Material "${material.name}": ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+            }
+          }
+
+          // Process tools
+          for (let i = 0; i < env.tools.length; i++) {
+            const tool = env.tools[i];
+            addStatus(`\n🔧 Verarbeite Werkzeug: ${tool.name}`);
+            
+            const filterContext = {
+              itemName: tool.name,
+              itemType: 'tool' as const,
+              tool_type: tool.tool_type,
+              educationalLevel: updatedTemplate.context.educational_level,
+              subject: updatedTemplate.context.subject,
+              activityName: '',
+              roleName: '',
+              taskDescription: '',
+              template: updatedTemplate
+            };
+
+            try {
+              const criteria = await generateFilterCriteria(
+                filterContext,
+                apiKey,
+                selectedMetadata,
+                addStatus
+              );
+
+              updatedEnvironments[envIndex].tools[i] = {
+                ...tool,
+                filter_criteria: criteria,
+                source: 'filter'
+              };
+            } catch (error) {
+              addStatus(`❌ Fehler beim Verarbeiten von Werkzeug "${tool.name}": ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+            }
+          }
+
+          // Process services
+          for (let i = 0; i < env.services.length; i++) {
+            const service = env.services[i];
+            addStatus(`\n🔌 Verarbeite Dienst: ${service.name}`);
+            
+            const filterContext = {
+              itemName: service.name,
+              itemType: 'service' as const,
+              service_type: service.service_type,
+              educationalLevel: updatedTemplate.context.educational_level,
+              subject: updatedTemplate.context.subject,
+              activityName: '',
+              roleName: '',
+              taskDescription: '',
+              template: updatedTemplate
+            };
+
+            try {
+              const criteria = await generateFilterCriteria(
+                filterContext,
+                apiKey,
+                selectedMetadata,
+                addStatus
+              );
+
+              updatedEnvironments[envIndex].services[i] = {
+                ...service,
+                filter_criteria: criteria,
+                source: 'filter'
+              };
+            } catch (error) {
+              addStatus(`❌ Fehler beim Verarbeiten von Dienst "${service.name}": ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+            }
+          }
+        }
+
+        // Update environments in template and store
+        updatedTemplate.environments = updatedEnvironments;
+        state.setEnvironments(updatedEnvironments);
+        addStatus('\n✅ KI Filter Verarbeitung abgeschlossen!');
+      }
+
+      // Step 3: WLO Content Processing
+      if (useWLOInhalte) {
+        addStatus('\n🌐 Starte WLO Inhalte Verarbeitung...');
+        
+        if (!updatedTemplate.environments || updatedTemplate.environments.length === 0) {
+          addStatus('⚠️ Keine Lernumgebungen im Template gefunden');
+          return;
+        }
+
+        addStatus(`📊 Gefundene Lernumgebungen: ${updatedTemplate.environments.length}`);
+        
+        let updatedEnvironments = [...updatedTemplate.environments];
+        
+        for (let envIndex = 0; envIndex < updatedEnvironments.length; envIndex++) {
+          const env = updatedEnvironments[envIndex];
+          addStatus(`\n📂 Verarbeite Lernumgebung: ${env.name}`);
+
+          // Debug output for resources
+          addStatus(`📊 Ressourcen in Umgebung:`);
+          addStatus(`- Materialien: ${env.materials?.length || 0}`);
+          addStatus(`- Werkzeuge: ${env.tools?.length || 0}`);
+          addStatus(`- Dienste: ${env.services?.length || 0}`);
+
+          // Process materials
+          if (env.materials?.length > 0) {
+            addStatus('\n🔄 Verarbeite Materialien...');
+            env.materials = await processResources(
+              env.materials,
+              'material',
+              env.materials.map(m => m.id),
+              env.name,
+              addStatus,
+              {
+                endpoint: API_ENDPOINTS[endpoint],
+                maxItems,
+                combineMode,
+                signal: abortControllerRef.current.signal
+              }
+            );
+          }
+
+          // Process tools
+          if (env.tools?.length > 0) {
+            addStatus('\n🔄 Verarbeite Werkzeuge...');
+            env.tools = await processResources(
+              env.tools,
+              'tool',
+              env.tools.map(t => t.id),
+              env.name,
+              addStatus,
+              {
+                endpoint: API_ENDPOINTS[endpoint],
+                maxItems,
+                combineMode,
+                signal: abortControllerRef.current.signal
+              }
+            );
+          }
+
+          // Process services
+          if (env.services?.length > 0) {
+            addStatus('\n🔄 Verarbeite Dienste...');
+            env.services = await processResources(
+              env.services,
+              'service',
+              env.services.map(s => s.id),
+              env.name,
+              addStatus,
+              {
+                endpoint: API_ENDPOINTS[endpoint],
+                maxItems,
+                combineMode,
+                signal: abortControllerRef.current.signal
+              }
+            );
+          }
+        }
+
+        // Update environments in store
+        state.setEnvironments(updatedEnvironments);
+        addStatus('\n✅ WLO Inhalte Verarbeitung erfolgreich abgeschlossen');
+      }
 
       setSuccess(true);
       setUserInput('');
+      addStatus('\n🎉 Gesamtverarbeitung erfolgreich abgeschlossen!');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Verarbeitung wurde abgebrochen');
+        addStatus('\n❌ Verarbeitung wurde abgebrochen');
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Ein unbekannter Fehler ist aufgetreten';
+        setError(errorMessage);
+        addStatus(`\n❌ Fehler bei der Verarbeitung: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -82,51 +361,128 @@ export function AIFlowAgent() {
         <SaveLoad />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">OpenAI API-Schlüssel</label>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="sk-..."
-          />
-        </div>
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg shadow-sm mb-8">
+        <p className="text-indigo-900">
+          Die KI unterstützt Sie bei der Erstellung und Optimierung Ihres didaktischen Templates. 
+          Sie können den kompletten Unterrichtsablauf generieren lassen oder bestehende Strukturen optimieren. 
+          Zusätzlich hilft die KI bei der Suche nach passenden Bildungsressourcen in der WLO-Datenbank.
+        </p>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">KI-Modell</label>
-          <select
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            {AI_MODELS.map((model) => (
-              <option key={model.id} value={model.id}>
-                {model.name}
-              </option>
-            ))}
-          </select>
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg font-semibold mb-4">API-Konfiguration</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">OpenAI API-Schlüssel</label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="sk-..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">KI-Modell</label>
+            <select
+              value={model}
+              disabled
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              {AI_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg font-semibold mb-4">Prozessauswahl</h2>
+        <div className="space-y-4">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={useKIFilter}
+              onChange={(e) => setUseKIFilter(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span>KI Filter</span>
+          </label>
+
+          {useKIFilter && (
+            <div className="pl-8 space-y-2">
+              <div className="text-sm font-medium text-gray-700 mb-2">Metadaten für Filter:</div>
+              {METADATA_OPTIONS.map(option => (
+                <label key={option.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedMetadata.includes(option.id)}
+                    onChange={() => handleMetadataToggle(option.id)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={useWLOInhalte}
+              onChange={(e) => setUseWLOInhalte(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span>WLO Inhalte</span>
+          </label>
+
+          {useWLOInhalte && (
+            <div className="pl-8 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">API-Endpunkt</label>
+                <select
+                  value={endpoint}
+                  onChange={(e) => setEndpoint(e.target.value as keyof typeof API_ENDPOINTS)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="PRODUCTION">Produktion</option>
+                  <option value="STAGING">Staging</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Maximale Ergebnisse</label>
+                <input
+                  type="number"
+                  value={maxItems}
+                  onChange={(e) => setMaxItems(Math.max(1, parseInt(e.target.value) || 1))}
+                  min="1"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Verknüpfungsmodus</label>
+                <select
+                  value={combineMode}
+                  onChange={(e) => setCombineMode(e.target.value as 'OR' | 'AND')}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="AND">UND</option>
+                  <option value="OR">ODER</option>
+                </select>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Aktuelles Template
-        </label>
-        <div className="h-[40vh] border rounded-lg overflow-hidden bg-gray-50">
-          <Editor
-            value={JSON.stringify(currentTemplate, null, 2)}
-            onChange={() => {}}
-            readOnly
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Anweisungen für KI
-        </label>
+        <label className="block text-sm font-medium text-gray-700">Anweisungen für KI</label>
         <textarea
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
@@ -134,6 +490,15 @@ export function AIFlowAgent() {
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           placeholder="Geben Sie Ihre Anweisungen für die Anpassung des Templates ein..."
         />
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg font-semibold mb-4">Verarbeitungsstatus</h2>
+        <div className="h-[20vh] border rounded-lg overflow-y-auto bg-gray-50 p-4 font-mono text-sm whitespace-pre-wrap">
+          {status.map((message, index) => (
+            <div key={index}>{message}</div>
+          ))}
+        </div>
       </div>
 
       {error && (
@@ -148,7 +513,15 @@ export function AIFlowAgent() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
+        {loading && (
+          <button
+            onClick={handleCancel}
+            className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
+          >
+            Abbrechen
+          </button>
+        )}
         <button
           onClick={handleProcess}
           disabled={loading}
@@ -158,9 +531,11 @@ export function AIFlowAgent() {
               : 'bg-blue-500 hover:bg-blue-600'
           }`}
         >
-          {loading ? 'Verarbeite...' : 'Mit KI verarbeiten'}
+          {loading ? 'Verarbeite...' : 'Verarbeitung starten'}
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default AIFlowAgent;

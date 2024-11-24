@@ -1,13 +1,24 @@
-import { searchWLO } from '../../lib/wloApi';
+import { WLOSearchParams, searchWLO } from '../../lib/wloApi';
+import { WLOMetadata } from '../../lib/types';
 
 interface ProcessOptions {
   endpoint: string;
   maxItems: number;
   combineMode: 'OR' | 'AND';
+  signal?: AbortSignal;
 }
 
-async function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function extractWLOMetadata(node: any): WLOMetadata {
+  const properties = node.properties || {};
+  return {
+    title: properties['cclom:title']?.[0] || '',
+    keywords: properties['cclom:general_keyword'] || [],
+    description: properties['cclom:general_description']?.[0] || '',
+    subject: properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
+    educationalContext: properties['ccm:educationalcontext_DISPLAYNAME'] || [],
+    wwwUrl: properties['ccm:wwwurl']?.[0] || null,
+    previewUrl: node.preview?.url || null
+  };
 }
 
 async function processResourceItem(
@@ -17,8 +28,6 @@ async function processResourceItem(
   addStatus: (message: string) => void,
   options: ProcessOptions
 ) {
-  addStatus(`\nVerarbeite ${type} "${resource.name}" in Lernumgebung "${environmentName}"`);
-
   if (!resource.filter_criteria || Object.keys(resource.filter_criteria).length === 0) {
     addStatus(`⚠️ Keine Filterkriterien definiert für ${type} "${resource.name}"`);
     return resource;
@@ -29,138 +38,67 @@ async function processResourceItem(
 
   addStatus(`🔍 Suche mit Kriterien: ${properties.map((p, i) => `${p}=${values[i]}`).join(', ')}`);
 
-  const params = new URLSearchParams();
-  params.append('contentType', 'FILES');
-  params.append('combineMode', options.combineMode);
-  properties.forEach(prop => params.append('property', prop));
-  values.forEach(value => params.append('value', value));
-  params.append('maxItems', options.maxItems.toString());
-  params.append('skipCount', '0');
-  params.append('propertyFilter', '-all-');
-
-  const requestUrl = `${options.endpoint}/search/v1/custom/-home-?${params.toString()}`;
-  const curlCommand = `curl -X 'GET' '${requestUrl}' -H 'accept: application/json' -H 'Access-Control-Allow-Origin: *'`;
-
-  addStatus(`\n📡 Request URL:\n${requestUrl}`);
-  addStatus(`\n🔧 Curl command:\n${curlCommand}\n`);
-
   try {
-    addStatus('⏳ Warte 2 Sekunden vor der Anfrage...');
-    await delay(2000);
+    if (options.signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
 
-    addStatus('🚀 Sende Anfrage...');
+    addStatus('🚀 Sende WLO-Anfrage...');
     const searchResults = await searchWLO({
       properties,
       values,
       maxItems: options.maxItems,
       endpoint: options.endpoint,
-      combineMode: options.combineMode
+      combineMode: options.combineMode,
+      signal: options.signal
     });
 
     if (!searchResults.nodes || searchResults.nodes.length === 0) {
-      addStatus(`ℹ️ Keine Ergebnisse gefunden für ${type} "${resource.name}"`);
+      addStatus(`ℹ️ Keine WLO-Ergebnisse gefunden für ${type} "${resource.name}"`);
       return resource;
     }
 
+    // Extrahiere die Node-UUIDs aus den Properties
     const nodeIds = searchResults.nodes
-      .map(node => node.nodeId)
+      .map(node => node.properties['sys:node-uuid']?.[0])
       .filter(Boolean)
-      .slice(0, options.maxItems)
       .join(',');
 
-    if (!nodeIds) {
-      addStatus(`⚠️ Ergebnisse gefunden, aber keine gültigen Node-IDs für ${type} "${resource.name}"`);
-      return resource;
-    }
+    const firstResult = searchResults.nodes[0];
 
-    addStatus(`✅ ${searchResults.nodes.length} Ergebnisse gefunden, Node-IDs: ${nodeIds}`);
+    addStatus(`✅ ${searchResults.nodes.length} WLO-Ergebnisse gefunden:`);
+    searchResults.nodes.forEach((node, index) => {
+      addStatus(`   ${index + 1}. ${node.properties['cclom:title']?.[0] || 'Ohne Titel'}`);
+      if (node.properties['cclom:general_description']?.[0]) {
+        addStatus(`      ${node.properties['cclom:general_description'][0].substring(0, 100)}...`);
+      }
+      if (node.properties['ccm:wwwurl']?.[0]) {
+        addStatus(`      URL: ${node.properties['ccm:wwwurl'][0]}`);
+      }
+      // Log Node-UUID
+      if (node.properties['sys:node-uuid']?.[0]) {
+        addStatus(`      ID: ${node.properties['sys:node-uuid'][0]}`);
+      }
+    });
+
+    const wloMetadata = extractWLOMetadata(firstResult);
     
     return {
       ...resource,
       source: 'database',
       database_id: nodeIds,
-      filter_criteria: undefined
+      filter_criteria: undefined,
+      wlo_metadata: wloMetadata
     };
+
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
-    console.error('Suchfehler Details:', error);
-    
-    addStatus(`\n❌ Fehler bei der Verarbeitung von ${type} "${resource.name}":`);
-    addStatus(`   Fehlertyp: ${error instanceof Error ? error.name : 'Unbekannt'}`);
-    addStatus(`   Fehlermeldung: ${errorMessage}`);
-    
-    if (error instanceof Error && error.stack) {
-      addStatus(`   Stack trace: ${error.stack}`);
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
     }
-    
-    if (error instanceof Response) {
-      addStatus(`   Status: ${error.status} ${error.statusText}`);
-      try {
-        const errorBody = await error.text();
-        addStatus(`   Antwort-Body: ${errorBody}`);
-      } catch (e) {
-        addStatus(`   Konnte Antwort-Body nicht lesen: ${e}`);
-      }
-    }
-    
-    addStatus('\nNeuer Versuch in 5 Sekunden...');
-    await delay(5000);
-    
-    try {
-      addStatus('🔄 Wiederhole Anfrage...');
-      const retryResults = await searchWLO({
-        properties,
-        values,
-        maxItems: options.maxItems,
-        endpoint: options.endpoint,
-        combineMode: options.combineMode
-      });
-
-      if (!retryResults.nodes || retryResults.nodes.length === 0) {
-        addStatus(`ℹ️ Wiederholung erfolgreich, aber keine Ergebnisse für ${type} "${resource.name}"`);
-        return resource;
-      }
-
-      const retryNodeIds = retryResults.nodes
-        .map(node => node.nodeId)
-        .filter(Boolean)
-        .slice(0, options.maxItems)
-        .join(',');
-
-      if (!retryNodeIds) {
-        addStatus(`⚠️ Wiederholung fand Ergebnisse, aber keine gültigen Node-IDs für ${type} "${resource.name}"`);
-        return resource;
-      }
-
-      addStatus(`✅ Wiederholung erfolgreich! ${retryResults.nodes.length} Ergebnisse gefunden, Node-IDs: ${retryNodeIds}`);
-      
-      return {
-        ...resource,
-        source: 'database',
-        database_id: retryNodeIds,
-        filter_criteria: undefined
-      };
-    } catch (retryError) {
-      const retryErrorMessage = retryError instanceof Error ? retryError.message : 'Unbekannter Fehler';
-      addStatus(`❌ Wiederholung ebenfalls fehlgeschlagen: ${retryErrorMessage}`);
-      return resource;
-    }
-  }
-}
-
-export async function processResource(
-  resource: any,
-  type: string,
-  selectedIds: string[] | undefined,
-  environmentName: string,
-  addStatus: (message: string) => void,
-  options: ProcessOptions
-) {
-  if (!selectedIds?.includes(resource.id) || resource.source !== 'filter') {
+    console.error('Error processing resource:', error);
+    addStatus(`❌ Fehler bei der WLO-Verarbeitung: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     return resource;
   }
-
-  return processResourceItem(resource, type, environmentName, addStatus, options);
 }
 
 export async function processResources(
@@ -171,11 +109,17 @@ export async function processResources(
   addStatus: (message: string) => void,
   options: ProcessOptions
 ) {
+  if (!resources || resources.length === 0) {
+    addStatus(`⚠️ Keine ${type} zum Verarbeiten gefunden`);
+    return [];
+  }
+
+  addStatus(`📊 Verarbeite ${resources.length} ${type}...`);
   const updatedResources = [];
   
-  // Process resources sequentially
   for (const resource of resources) {
-    if (selectedIds?.includes(resource.id) && resource.source === 'filter') {
+    if (resource.source === 'filter') {
+      addStatus(`\n🔄 Verarbeite ${type} "${resource.name}" mit WLO...`);
       const updatedResource = await processResourceItem(
         resource,
         type,

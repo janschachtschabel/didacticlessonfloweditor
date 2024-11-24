@@ -22,10 +22,17 @@ export function GeneralSettings() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
-        <h1 className="text-2xl font-bold">Allgemeine Einstellungen</h1>
+        <h1 className="text-2xl font-bold">Allgemeines</h1>
         <SaveLoad />
       </div>
       
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm mb-8">
+        <p className="text-blue-800">
+          Hier können Sie die allgemeinen Informationen Ihres didaktischen Templates festlegen. 
+          Diese Metadaten helfen bei der Organisation und dem Auffinden des Templates.
+        </p>
+      </div>
+
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="space-y-4">
           <div>

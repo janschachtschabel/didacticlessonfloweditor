@@ -147,9 +147,26 @@ export function LearningEnvironments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-start">
         <h1 className="text-2xl font-bold">Lernumgebungen</h1>
         <SaveLoad />
+      </div>
+
+      <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-lg shadow-sm mb-8">
+        <p className="text-teal-900">
+          Lernumgebungen sind die Räume und Kontexte, in denen das Lernen stattfindet. Sie können eine oder mehrere 
+          Lernumgebungen definieren und diese mit den benötigten Ressourcen ausstatten. Jede Lernumgebung kann folgende 
+          Elemente enthalten:
+        </p>
+        <ul className="mt-4 space-y-2 text-teal-800 list-disc list-inside">
+          <li>Lernressourcen (z.B. Arbeitsblätter, Videos, Übungen)</li>
+          <li>Werkzeuge (z.B. Hardware, Software, Geräte)</li>
+          <li>Dienste (z.B. Unterstützungsangebote, Online-Plattformen)</li>
+        </ul>
+        <p className="mt-4 text-teal-900">
+          Wichtig: Alle Lernressourcen, Werkzeuge und Dienste, die Sie später im Unterrichtsablauf verwenden möchten, 
+          müssen hier einer passenden Lernumgebung zugeordnet werden.
+        </p>
       </div>
 
       {environments.map((env) => (
@@ -184,7 +201,6 @@ export function LearningEnvironments() {
             </button>
           </div>
 
-          {/* Lernressourcen */}
           <div className="mt-6">
             <div className="mb-4">
               <h3 className="text-lg font-medium mb-2">Lernressourcen</h3>
@@ -207,7 +223,6 @@ export function LearningEnvironments() {
             ))}
           </div>
 
-          {/* Werkzeuge */}
           <div className="mt-6">
             <div className="mb-4">
               <h3 className="text-lg font-medium mb-2">Werkzeuge</h3>
@@ -229,7 +244,6 @@ export function LearningEnvironments() {
             ))}
           </div>
 
-          {/* Dienste */}
           <div className="mt-6">
             <div className="mb-4">
               <h3 className="text-lg font-medium mb-2">Dienste</h3>

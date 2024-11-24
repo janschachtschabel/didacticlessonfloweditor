@@ -1,135 +1,85 @@
-# Didaktischer Template-Prozessor
+# KI Assistent für Unterrichtsabläufe
 
-Ein webbasiertes Tool zum Erstellen und Verwalten von didaktischen Templates mit einem visuellen Flow-Editor. Entwerfen Sie Lernsequenzen, verwalten Sie Akteure und Lernumgebungen und visualisieren Sie den Lernprozess.
+Ein webbasiertes Tool zur Erstellung und Optimierung von didaktischen Templates mit KI-Unterstützung und WLO-Integration.
+
+## Features
+
+- Erstellung und Bearbeitung von didaktischen Templates
+- KI-gestützte Generierung und Optimierung von Unterrichtsabläufen
+- KI-basierte Filterkriterien für Bildungsressourcen
+- Integration mit der Wirlernenonline.de (WLO) Plattform
+- Visualisierung von Lernsequenzen als Graph und Tabelle
+- PDF-Export von Templates
 
 ## Voraussetzungen
 
-- Node.js (Download unter: https://nodejs.org/)
+- Node.js (Version 18 oder höher)
 - npm (wird mit Node.js mitgeliefert)
 
 ## Installation
 
-1. Repository klonen
+1. Repository klonen oder herunterladen
 2. Abhängigkeiten installieren:
 ```bash
 npm install
 ```
 
-## Erste Schritte
+## Entwicklung starten
 
-### Entwicklungsserver mit Proxy starten:
-
+1. Proxy-Server für WLO-Zugriff starten (in einem separaten Terminal):
 ```bash
-# Terminal 1: Proxy-Server starten
 npm run proxy
+```
 
-# Terminal 2: Entwicklungsserver starten
+2. Entwicklungsserver starten (in einem anderen Terminal):
+```bash
 npm run dev
 ```
 
 Die Anwendung ist dann unter `http://localhost:5173` verfügbar.
-Der Proxy-Server läuft auf Port 3001 und ermöglicht den Zugriff auf die WLO-API.
 
-## Funktionen
+## Proxy Server
 
-### 1. Template-Verwaltung
-- Erstellen und Bearbeiten von didaktischen Templates
-- Speichern und Laden von Templates als JSON-Dateien
-- Beispiel-Templates enthalten
-- PDF-Export mit detaillierter Aufbereitung
+Der Proxy Server ist erforderlich für den Zugriff auf die WLO-API und läuft standardmäßig auf Port 3001. Er bietet:
 
-### 2. Visuelle Komponenten
-
-#### Allgemeine Einstellungen
-- Template-Metadaten festlegen
-- Titel, Beschreibung und Schlüsselwörter definieren
-- Versionsinformationen verwalten
-
-#### Patternelemente
-- Probleme und Lernziele definieren
-- Einflussfaktoren festlegen
-- Kontext und Lösungen konfigurieren
-
-#### Akteure
-- Akteure erstellen und verwalten (Lehrkräfte, Schüler, Gruppen)
-- Akteur-Eigenschaften definieren:
-  - Demografische Daten
-  - Bildungsniveau
-  - Kompetenzen
-  - Lernanforderungen
-
-#### Lernumgebungen
-- Lernräume konfigurieren
-- Ressourcen verwalten:
-  - Lernmaterialien
-  - Werkzeuge
-  - Dienste
-
-#### Unterrichtsablauf
-- Lernsequenzen gestalten
-- Phasen und Aktivitäten erstellen
-- Rollen und Aufgaben definieren
-- Bewertungskriterien festlegen
-
-#### Vorschau
-- Visueller Flow-Graph mit:
-  - Sequenzstruktur
-  - Prozessablauf
-  - Parallele Aktivitäten
-  - Rollenbeziehungen
-- Tabellenansicht für detaillierte Sequenzinformationen
-- Rohdatenansicht für JSON-Struktur
-
-### 3. Visualisierungsmerkmale
-
-Der Flow-Graph verwendet verschiedene Farben und Stile:
-
-- **Strukturelle Beziehungen**
-  - Enthält/Implementiert (gestrichelte Linien)
-  - Referenzen (gestrichelte Linien)
-
-- **Prozessablauf**
-  - Sequenzieller Ablauf (orange, animiert)
-  - Parallele Ausführung (lila, animiert)
-
-- **Knotentypen**
-  - Lösung/Ansatz (grau)
-  - Lernsequenzen (blau)
-  - Phasen (grün)
-  - Aktivitäten (gelb)
-  - Rollen (orange)
-  - Akteure (pink)
-  - Lernumgebungen (lila)
-  - Materialien (rot)
-  - Werkzeuge (indigo)
-  - Dienste (türkis)
+- `/proxy` - Hauptendpunkt für WLO-API-Anfragen
+- `/health` - Gesundheitscheck des Proxy-Servers
 
 ## Projektstruktur
 
 ```
 src/
-├── components/         # Wiederverwendbare UI-Komponenten
-│   ├── course/        # Komponenten für den Unterrichtsablauf
-│   ├── environments/  # Komponenten für Umgebungsverwaltung
-│   └── preview/       # Visualisierungskomponenten
-├── pages/             # Hauptseiten-Komponenten
-├── store/             # Zustandsverwaltung
-└── lib/              # Hilfsfunktionen und Typen
+  ├── components/         # React-Komponenten
+  │   ├── course/        # Komponenten für Unterrichtsablauf
+  │   ├── environments/  # Komponenten für Lernumgebungen
+  │   ├── preview/       # Komponenten für Vorschau
+  │   └── wlo/          # Komponenten für WLO-Integration
+  ├── lib/              # Hilfsfunktionen und Utilities
+  ├── pages/            # Hauptseiten der Anwendung
+  ├── server/           # Proxy-Server für WLO-Zugriff
+  └── store/            # Zustand-Management mit Zustand
+
+public/                 # Statische Assets
 ```
 
-## Datenmodell
+## Wichtige Hinweise
 
-Die Template-Struktur folgt einem hierarchischen Modell:
-- Sequenzen enthalten Phasen
-- Phasen enthalten Aktivitäten
-- Aktivitäten enthalten Rollen
-- Rollen referenzieren Akteure und Umgebungen
-- Umgebungen enthalten Materialien, Werkzeuge und Dienste
+- Der Proxy Server muss laufen, damit WLO-Inhalte abgerufen werden können
+- Alle API-Anfragen werden über den Proxy geleitet, um CORS-Probleme zu vermeiden
+- OpenAI API-Key wird für KI-Funktionen benötigt
+- URLs für WLO-Anfragen werden automatisch bereinigt (Kommas werden entfernt)
 
-## Mitwirken
+## Workflow
 
-1. Repository forken
-2. Feature-Branch erstellen
-3. Änderungen committen
-4. Zum Branch pushen
-5. Pull Request erstellen
+1. Allgemeines - Grundlegende Informationen festlegen
+2. Didaktische Grundlagen - Probleme, Ziele und Lösungsansätze definieren
+3. Akteure - Beteiligte Personen und Gruppen anlegen
+4. Lernumgebungen - Ressourcen, Werkzeuge und Dienste zuordnen
+5. Unterrichtsablauf - Sequenzen, Phasen und Aktivitäten gestalten
+6. KI Ablauf - Template optimieren und WLO-Inhalte integrieren
+
+## Bekannte Einschränkungen
+
+- Der Proxy Server muss manuell gestartet werden
+- Nur GET-Anfragen an die WLO-API werden unterstützt
+- Maximale Timeout-Zeit für WLO-Anfragen: 60 Sekunden

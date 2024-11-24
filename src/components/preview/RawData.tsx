@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import React from 'react';
 import { useTemplateStore } from '../../store/templateStore';
 import { Editor } from '../Editor';
 
-export const RawData: FC = () => {
+export function RawData() {
   const state = useTemplateStore();
   
   const currentTemplate = {
@@ -22,13 +22,13 @@ export const RawData: FC = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Raw Data</h2>
       <div className="h-[500px] border rounded-lg overflow-hidden">
         <Editor
           value={JSON.stringify(currentTemplate, null, 2)}
           onChange={() => {}}
+          readOnly={true}
         />
       </div>
     </div>
   );
-};
+}
