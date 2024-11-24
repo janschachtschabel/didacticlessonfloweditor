@@ -1,6 +1,6 @@
 # KI Assistent für Unterrichtsabläufe
 
-Ein webbasiertes Tool zur Erstellung und Optimierung von didaktischen Templates mit KI-Unterstützung und WLO-Integration.
+Ein webbasiertes Tool zur Erstellung und Optimierung von Unterrichtsabläufen auf Basis eines didaktischen Templates mit KI-Unterstützung und Inhalte-Integration.
 
 ## Features
 
