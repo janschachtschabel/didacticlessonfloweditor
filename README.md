@@ -26,7 +26,7 @@ npm install
 
 ## Entwicklung starten
 
-1. Proxy-Server für WLO-Zugriff starten (in einem separaten Terminal):
+1. Proxy-Server für Inhalte-Zugriff starten (in einem separaten Terminal):
 ```bash
 npm run proxy
 ```
