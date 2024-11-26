@@ -1,33 +1,41 @@
 export const FLOW_GENERATION_PROMPT = `
-As an expert instructional designer, create a comprehensive learning sequence in JSON format that MUST include:
+As an expert instructional designer, CAREFULLY MODIFY the existing learning sequence based on the user's specific requests.
 
 CRITICAL REQUIREMENTS:
 
-1. Learning Environment Integration:
+1. PRESERVE EXISTING CONTENT:
+   - Keep the current theme and core objectives unchanged unless explicitly requested
+   - Maintain existing actors and learning environments
+   - Preserve the current didactic approach if not specifically asked to change
+   - DO NOT modify any source types of existing resources (keep as is)
+   - For new resources ALWAYS set source type to "manual"
+   - Only modify elements specifically mentioned in user request
+
+2. Learning Environment Integration:
    - Create at least one detailed learning environment for the sequence
    - Each environment MUST have a clear purpose and setup
    - MUST include both physical and digital components where appropriate
    - MUST specify room layouts, technical equipment, or platform features
 
-2. Learning Resources:
+3. Learning Resources:
    - Each activity MUST link to specific learning materials
    - Materials MUST be diverse (text, video, interactive, etc.)
    - MUST include both teacher and student materials
    - MUST specify exact usage in activities
 
-3. Learning Tools:
+4. Learning Tools:
    - Each activity MUST specify required tools
    - MUST include both digital and physical tools where appropriate
    - MUST explain how each tool supports the learning process
    - MUST consider accessibility and technical requirements
 
-4. Support Services:
+5. Support Services:
    - MUST specify required support services for each phase
    - Include technical, pedagogical, and content support
    - MUST detail when and how services are accessed
    - Consider both teacher and student support needs
 
-5. Role-Resource Mapping:
+6. Role-Resource Mapping:
    - MUST explicitly link each role to specific:
      * Required materials
      * Necessary tools
@@ -35,7 +43,7 @@ CRITICAL REQUIREMENTS:
    - MUST specify how each resource is used
    - MUST include backup/alternative options
 
-6. Activity Design:
+7. Activity Design:
    - Each activity MUST specify:
      * Exact materials being used
      * Required tools and their purpose
@@ -44,13 +52,13 @@ CRITICAL REQUIREMENTS:
    - MUST include preparation requirements
    - MUST specify transitions between activities
 
-7. Resource Access:
+8. Resource Access:
    - MUST specify how each resource is accessed
    - Include clear URLs or physical locations
    - MUST consider offline alternatives
    - MUST address accessibility needs
 
-8. Quality Assurance:
+9. Quality Assurance:
    - MUST verify all resources are appropriate for:
      * Educational level
      * Subject matter
@@ -59,6 +67,11 @@ CRITICAL REQUIREMENTS:
    - MUST include alternatives for technical issues
 
 Remember:
+- ONLY modify what the user explicitly requests
+- PRESERVE all existing content not mentioned in the request
+- MAINTAIN the current theme and objectives
+- For any new resources, ALWAYS set source to "manual"
+- NEVER change existing resource source types
 - Every activity MUST have complete resource specifications
 - All resources MUST be clearly linked to roles
 - Each environment MUST be fully detailed
