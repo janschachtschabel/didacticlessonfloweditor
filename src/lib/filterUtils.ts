@@ -63,7 +63,10 @@ export async function generateFilterCriteria(
 
 async function generateSearchTerm(client: OpenAI, context: FilterContext): Promise<string> {
   const prompt = `
-Generate a SINGLE, CONCISE search term (1-2 words maximum) that best represents the core concept or topic for finding this educational resource.
+Generate a SINGLE, CONCISE search term that represents ONLY the core topic or concept, without including any metadata like:
+- Resource type (e.g. "Arbeitsblatt", "Video", "Tool")
+- Subject area (e.g. "Mathematik", "Physik")
+- Educational level (e.g. "Grundschule", "Sekundarstufe")
 
 Context:
 Item: ${context.itemName} (${context.itemType})
@@ -71,17 +74,21 @@ Subject: ${context.subject}
 Educational Level: ${context.educationalLevel}
 
 IMPORTANT:
-- Return ONLY the search term
+- Return ONLY the core topic/concept
 - Use ONLY 1-2 words maximum
-- Focus on the main concept/topic
-- Do NOT include articles, conjunctions, or prepositions
-- Prefer nouns or noun phrases
+- EXCLUDE any metadata terms
+- Focus on what is being taught/learned
+- Do NOT include resource types or context information
 
-Example good responses:
-- "Addition"
-- "Zahlenbingo"
-- "Taschenrechner"
-- "Mathematikförderung"`;
+Examples:
+Input -> Output
+"Arbeitsblatt Addition" -> "Addition"
+"Mathematik Video Bruchrechnen" -> "Bruchrechnen"
+"Physik Simulator Pendel" -> "Pendel"
+"Vokabeltrainer Englisch" -> "Vokabeln"
+"Chemie Experiment Säuren" -> "Säuren"
+
+Return ONLY the search term without any explanation.`;
 
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",
