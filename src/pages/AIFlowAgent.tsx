@@ -8,7 +8,8 @@ import { generateFilterCriteria } from '../lib/filterUtils';
 import { processResources } from '../components/wlo/ResourceProcessor';
 
 const AI_MODELS = [
-  { id: 'gpt-4o-mini', name: 'GPT-4O Mini' }
+  { id: 'gpt-4o-mini', name: 'GPT-4O Mini' },
+  { id: 'gpt-4o', name: 'GPT-4O' }
 ];
 
 const API_ENDPOINTS = {
@@ -26,7 +27,7 @@ const METADATA_OPTIONS = [
 const AIFlowAgent: React.FC = () => {
   const state = useTemplateStore();
   const [apiKey, setApiKey] = useState('');
-  const [model] = useState('gpt-4o-mini');
+  const [model, setModel] = useState('gpt-4o-mini');
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +36,9 @@ const AIFlowAgent: React.FC = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Process selection states
-  const [useKIFilter, setUseKIFilter] = useState(true);
-  const [useWLOInhalte, setUseWLOInhalte] = useState(true);
+  const [useKIFlow, setUseKIFlow] = useState(true);
+  const [useKIFilter, setUseKIFilter] = useState(false);
+  const [useWLOInhalte, setUseWLOInhalte] = useState(false);
   const [selectedMetadata, setSelectedMetadata] = useState(['cclom:title', 'ccm:oeh_lrt_aggregated', 'ccm:taxonid']);
 
   // WLO options
@@ -86,7 +88,7 @@ const AIFlowAgent: React.FC = () => {
       return;
     }
 
-    if (!userInput) {
+    if (!userInput && useKIFlow) {
       setError('Bitte geben Sie Ihre Anweisungen ein');
       return;
     }
@@ -101,7 +103,7 @@ const AIFlowAgent: React.FC = () => {
       let updatedTemplate = currentTemplate;
 
       // Step 1: Generate template with AI
-      if (true) { // Always run template generation
+      if (useKIFlow) {
         addStatus('🤖 Starte KI Ablauf Verarbeitung...');
         const generatedTemplate = await generateTemplate(
           currentTemplate,
@@ -247,8 +249,7 @@ const AIFlowAgent: React.FC = () => {
           }
         }
 
-        // Update environments in template and store
-        updatedTemplate.environments = updatedEnvironments;
+        // Update environments in store
         state.setEnvironments(updatedEnvironments);
         addStatus('\n✅ KI Filter Verarbeitung abgeschlossen!');
       }
@@ -387,7 +388,7 @@ const AIFlowAgent: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700">KI-Modell</label>
             <select
               value={model}
-              disabled
+              onChange={(e) => setModel(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               {AI_MODELS.map((m) => (
@@ -403,6 +404,16 @@ const AIFlowAgent: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4">Prozessauswahl</h2>
         <div className="space-y-4">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={useKIFlow}
+              onChange={(e) => setUseKIFlow(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span>KI Ablauf</span>
+          </label>
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -437,7 +448,7 @@ const AIFlowAgent: React.FC = () => {
               onChange={(e) => setUseWLOInhalte(e.target.checked)}
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span>WLO Inhalte</span>
+            <span>WLO Inhalte (erfordert KI Filter)</span>
           </label>
 
           {useWLOInhalte && (
