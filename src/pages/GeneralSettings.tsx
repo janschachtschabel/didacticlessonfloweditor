@@ -12,10 +12,10 @@ const defaultMetadata = {
 export function GeneralSettings() {
   const { metadata = defaultMetadata, setMetadata } = useTemplateStore();
 
-  const handleKeywordsChange = (value: string) => {
+  const handleKeywordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMetadata({
       ...metadata,
-      keywords: value.split(',').map(k => k.trim()).filter(k => k)
+      keywords: e.target.value.split(',').map(k => k.trim())
     });
   };
 
@@ -42,6 +42,7 @@ export function GeneralSettings() {
               value={metadata.title}
               onChange={(e) => setMetadata({ ...metadata, title: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Geben Sie einen aussagekräftigen Titel ein"
             />
           </div>
 
@@ -52,6 +53,7 @@ export function GeneralSettings() {
               onChange={(e) => setMetadata({ ...metadata, description: e.target.value })}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Beschreiben Sie das Template und seine Ziele"
             />
           </div>
 
@@ -60,8 +62,9 @@ export function GeneralSettings() {
             <input
               type="text"
               value={metadata.keywords.join(', ')}
-              onChange={(e) => handleKeywordsChange(e.target.value)}
+              onChange={handleKeywordsChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="z.B. Mathematik, Inklusion, Differenzierung"
             />
           </div>
 
@@ -72,6 +75,7 @@ export function GeneralSettings() {
               value={metadata.author}
               onChange={(e) => setMetadata({ ...metadata, author: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Name oder Institution"
             />
           </div>
 
@@ -82,6 +86,7 @@ export function GeneralSettings() {
               value={metadata.version}
               onChange={(e) => setMetadata({ ...metadata, version: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="z.B. 1.0"
             />
           </div>
         </div>

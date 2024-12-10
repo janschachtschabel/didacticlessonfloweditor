@@ -1,9 +1,7 @@
-import type { Actor, LearningEnvironment } from '../store/templateStore';
-
 export const exampleActors: Actor[] = [
   {
     id: "A1",
-    name: "Jan Schachtschabel",
+    name: "Lehrender",
     type: "Einzelperson",
     demographic_data: {
       age: 35,

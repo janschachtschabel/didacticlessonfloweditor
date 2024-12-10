@@ -9,16 +9,19 @@ interface RoleInfo {
     name: string;
     metadata?: WLOMetadata;
     wwwUrl?: string | null;
+    access_link?: string;
   }[];
   tools: {
     name: string;
     metadata?: WLOMetadata;
     wwwUrl?: string | null;
+    access_link?: string;
   }[];
   services: {
     name: string;
     metadata?: WLOMetadata;
     wwwUrl?: string | null;
+    access_link?: string;
   }[];
 }
 
@@ -56,13 +59,28 @@ export function TableView() {
         return {
           name: resource.name,
           metadata: resource.wlo_metadata,
-          wwwUrl: resource.wlo_metadata?.wwwUrl
+          wwwUrl: resource.wlo_metadata?.wwwUrl,
+          access_link: resource.access_link
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
   };
 
-  const renderWLORecommendations = (resources: { name: string; metadata?: WLOMetadata; wwwUrl?: string | null }[]) => {
+  const renderResourceLink = (name: string, url?: string | null) => {
+    if (!url) return name;
+    return (
+      <a 
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 hover:underline"
+      >
+        {name}
+      </a>
+    );
+  };
+
+  const renderWLORecommendations = (resources: { name: string; metadata?: WLOMetadata; wwwUrl?: string | null; access_link?: string }[]) => {
     const hasWLOMetadata = resources.some(r => r.metadata);
     if (!hasWLOMetadata) return null;
 
@@ -74,17 +92,9 @@ export function TableView() {
             if (!resource.metadata) return null;
             return (
               <li key={idx}>
-                {resource.wwwUrl ? (
-                  <a 
-                    href={resource.wwwUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    {resource.metadata.title || resource.name}
-                  </a>
-                ) : (
-                  <span>{resource.metadata.title || resource.name}</span>
+                {renderResourceLink(
+                  resource.metadata.title || resource.name,
+                  resource.metadata.wwwUrl || resource.access_link
                 )}
               </li>
             );
@@ -94,13 +104,9 @@ export function TableView() {
     );
   };
 
-  // Rest of the component remains the same until the table rendering part
-  // In the table cell where roles are displayed, add the WLO recommendations:
-
   return (
     <div className="bg-white p-6 rounded-lg shadow overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
-        {/* Table header remains the same */}
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -119,7 +125,6 @@ export function TableView() {
         <tbody className="bg-white divide-y divide-gray-200">
           {sequences.map((sequence) => (
             <React.Fragment key={sequence.sequence_id}>
-              {/* Sequence header row remains the same */}
               <tr className="bg-blue-50">
                 <td 
                   colSpan={actors.length + 1} 
@@ -136,7 +141,6 @@ export function TableView() {
 
               {(sequence.phases || []).map((phase) => (
                 <React.Fragment key={phase.phase_id}>
-                  {/* Phase header row remains the same */}
                   <tr className="bg-green-50">
                     <td 
                       colSpan={actors.length + 1} 
@@ -203,7 +207,12 @@ export function TableView() {
                                   {roleInfo.materials.length > 0 && (
                                     <>
                                       <div className="text-sm text-gray-600">
-                                        Lernressourcen: {roleInfo.materials.map(m => m.name).join(', ')}
+                                        Lernressourcen: {roleInfo.materials.map((m, idx) => (
+                                          <React.Fragment key={idx}>
+                                            {idx > 0 && ', '}
+                                            {renderResourceLink(m.name, m.wwwUrl || m.access_link)}
+                                          </React.Fragment>
+                                        ))}
                                       </div>
                                       {renderWLORecommendations(roleInfo.materials)}
                                     </>
@@ -212,7 +221,12 @@ export function TableView() {
                                   {roleInfo.tools.length > 0 && (
                                     <>
                                       <div className="text-sm text-gray-600">
-                                        Werkzeuge: {roleInfo.tools.map(t => t.name).join(', ')}
+                                        Werkzeuge: {roleInfo.tools.map((t, idx) => (
+                                          <React.Fragment key={idx}>
+                                            {idx > 0 && ', '}
+                                            {renderResourceLink(t.name, t.wwwUrl || t.access_link)}
+                                          </React.Fragment>
+                                        ))}
                                       </div>
                                       {renderWLORecommendations(roleInfo.tools)}
                                     </>
@@ -221,7 +235,12 @@ export function TableView() {
                                   {roleInfo.services.length > 0 && (
                                     <>
                                       <div className="text-sm text-gray-600">
-                                        Dienste: {roleInfo.services.map(s => s.name).join(', ')}
+                                        Dienste: {roleInfo.services.map((s, idx) => (
+                                          <React.Fragment key={idx}>
+                                            {idx > 0 && ', '}
+                                            {renderResourceLink(s.name, s.wwwUrl || s.access_link)}
+                                          </React.Fragment>
+                                        ))}
                                       </div>
                                       {renderWLORecommendations(roleInfo.services)}
                                     </>

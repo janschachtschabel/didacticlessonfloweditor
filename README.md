@@ -1,6 +1,6 @@
 # KI Assistent für Unterrichtsabläufe
 
-Ein webbasiertes Tool zur Erstellung und Optimierung von Unterrichtsabläufen auf Basis eines didaktischen Templates mit KI-Unterstützung und Inhalte-Integration.
+Ein webbasiertes Tool zur Erstellung und Optimierung von didaktischen Templates mit KI-Unterstützung und WLO-Integration.
 
 ## Features
 
@@ -26,7 +26,7 @@ npm install
 
 ## Entwicklung starten
 
-1. Proxy-Server für Inhalte-Zugriff starten (in einem separaten Terminal):
+1. Proxy-Server für WLO-Zugriff starten (in einem separaten Terminal):
 ```bash
 npm run proxy
 ```

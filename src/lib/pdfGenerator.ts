@@ -30,7 +30,7 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
     yPos += lines.length * 7;
   };
 
-  const addListItem = (text: string, level = 0) => {
+  const addListItem = (text: string, level = 0, link?: string) => {
     if (!text) return;
     const indent = level * 5;
     if (yPos > pdf.internal.pageSize.height - 20) {
@@ -39,9 +39,18 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
     }
     const bullet = level === 0 ? '•' : '-';
     pdf.text(bullet, 20 + indent, yPos);
-    const lines = pdf.splitTextToSize(text, 165 - indent);
-    pdf.text(lines, 25 + indent, yPos);
-    yPos += lines.length * 7;
+    
+    if (link) {
+      const textWidth = pdf.getTextWidth(text);
+      pdf.setTextColor(0, 0, 255);
+      pdf.textWithLink(text, 25 + indent, yPos, { url: link });
+      pdf.setTextColor(0, 0, 0);
+    } else {
+      const lines = pdf.splitTextToSize(text, 165 - indent);
+      pdf.text(lines, 25 + indent, yPos);
+    }
+    
+    yPos += 7;
   };
 
   // Page 1: Title and General Information
@@ -175,10 +184,20 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
       if (env.materials?.length > 0) {
         addText('Lernressourcen:', 5);
         env.materials.forEach(mat => {
-          addListItem(`${mat.name} (${mat.material_type})`, 2);
+          const url = mat.wlo_metadata?.wwwUrl || mat.access_link;
+          if (url) {
+            addListItem(`${mat.name} (${mat.material_type})`, 2, url);
+          } else {
+            addListItem(`${mat.name} (${mat.material_type})`, 2);
+          }
           if (mat.wlo_metadata) {
             addText('WLO empfiehlt:', 10);
-            addListItem(`${mat.wlo_metadata.title}${mat.wlo_metadata.wwwUrl ? ` (${mat.wlo_metadata.wwwUrl})` : ''}`, 3);
+            const wloUrl = mat.wlo_metadata.wwwUrl;
+            if (wloUrl) {
+              addListItem(mat.wlo_metadata.title, 3, wloUrl);
+            } else {
+              addListItem(mat.wlo_metadata.title, 3);
+            }
           }
         });
       }
@@ -186,10 +205,20 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
       if (env.tools?.length > 0) {
         addText('Werkzeuge:', 5);
         env.tools.forEach(tool => {
-          addListItem(`${tool.name} (${tool.tool_type})`, 2);
+          const url = tool.wlo_metadata?.wwwUrl || tool.access_link;
+          if (url) {
+            addListItem(`${tool.name} (${tool.tool_type})`, 2, url);
+          } else {
+            addListItem(`${tool.name} (${tool.tool_type})`, 2);
+          }
           if (tool.wlo_metadata) {
             addText('WLO empfiehlt:', 10);
-            addListItem(`${tool.wlo_metadata.title}${tool.wlo_metadata.wwwUrl ? ` (${tool.wlo_metadata.wwwUrl})` : ''}`, 3);
+            const wloUrl = tool.wlo_metadata.wwwUrl;
+            if (wloUrl) {
+              addListItem(tool.wlo_metadata.title, 3, wloUrl);
+            } else {
+              addListItem(tool.wlo_metadata.title, 3);
+            }
           }
         });
       }
@@ -197,10 +226,20 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
       if (env.services?.length > 0) {
         addText('Dienste:', 5);
         env.services.forEach(service => {
-          addListItem(`${service.name} (${service.service_type})`, 2);
+          const url = service.wlo_metadata?.wwwUrl || service.access_link;
+          if (url) {
+            addListItem(`${service.name} (${service.service_type})`, 2, url);
+          } else {
+            addListItem(`${service.name} (${service.service_type})`, 2);
+          }
           if (service.wlo_metadata) {
             addText('WLO empfiehlt:', 10);
-            addListItem(`${service.wlo_metadata.title}${service.wlo_metadata.wwwUrl ? ` (${service.wlo_metadata.wwwUrl})` : ''}`, 3);
+            const wloUrl = service.wlo_metadata.wwwUrl;
+            if (wloUrl) {
+              addListItem(service.wlo_metadata.title, 3, wloUrl);
+            } else {
+              addListItem(service.wlo_metadata.title, 3);
+            }
           }
         });
       }
@@ -242,139 +281,72 @@ export async function generatePDF(state: ReturnType<typeof TemplateStore.getStat
           activity.roles.forEach(role => {
             addText(`${role.role_name}:`, 30);
             addText(role.task_description, 35);
+
+            if (role.learning_environment) {
+              const env = state.environments.find(e => e.id === role.learning_environment?.environment_id);
+              if (env) {
+                addText(`Lernumgebung: ${env.name}`, 35);
+
+                // Add materials with links
+                const materials = role.learning_environment.selected_materials
+                  ?.map(id => env.materials.find(m => m.id === id))
+                  .filter(Boolean);
+                if (materials?.length) {
+                  addText('Materialien:', 35);
+                  materials.forEach(m => {
+                    if (m) {
+                      const url = m.wlo_metadata?.wwwUrl || m.access_link;
+                      if (url) {
+                        addListItem(m.name, 8, url);
+                      } else {
+                        addListItem(m.name, 8);
+                      }
+                    }
+                  });
+                }
+
+                // Add tools with links
+                const tools = role.learning_environment.selected_tools
+                  ?.map(id => env.tools.find(t => t.id === id))
+                  .filter(Boolean);
+                if (tools?.length) {
+                  addText('Werkzeuge:', 35);
+                  tools.forEach(t => {
+                    if (t) {
+                      const url = t.wlo_metadata?.wwwUrl || t.access_link;
+                      if (url) {
+                        addListItem(t.name, 8, url);
+                      } else {
+                        addListItem(t.name, 8);
+                      }
+                    }
+                  });
+                }
+
+                // Add services with links
+                const services = role.learning_environment.selected_services
+                  ?.map(id => env.services.find(s => s.id === id))
+                  .filter(Boolean);
+                if (services?.length) {
+                  addText('Dienste:', 35);
+                  services.forEach(s => {
+                    if (s) {
+                      const url = s.wlo_metadata?.wwwUrl || s.access_link;
+                      if (url) {
+                        addListItem(s.name, 8, url);
+                      } else {
+                        addListItem(s.name, 8);
+                      }
+                    }
+                  });
+                }
+              }
+            }
           });
         }
       });
     });
     yPos += 10;
-  });
-
-  // Page 6: Table View
-  pdf.addPage();
-  yPos = 20;
-  addSectionHeader('Tabellarische Übersicht');
-
-  // Prepare table data
-  const tableData: any[] = [];
-  sequences.forEach(sequence => {
-    tableData.push([
-      { content: sequence.sequence_name, colSpan: state.actors.length + 1, styles: { fillColor: [200, 220, 255] } }
-    ]);
-
-    sequence.phases?.forEach(phase => {
-      tableData.push([
-        { content: `Phase: ${phase.phase_name}`, colSpan: state.actors.length + 1, styles: { fillColor: [220, 240, 255] } }
-      ]);
-
-      phase.activities?.forEach(activity => {
-        const activityData = [`${activity.name}\n${activity.description}\nDauer: ${activity.duration} min`];
-        
-        state.actors.forEach(actor => {
-          const roles = activity.roles?.filter(role => role.actor_id === actor.id) || [];
-          const roleText = roles.map(role => {
-            let text = `Rolle: ${role.role_name}\n${role.task_description}`;
-            if (role.learning_environment) {
-              const env = state.environments.find(e => e.id === role.learning_environment?.environment_id);
-              if (env) {
-                text += `\nLernumgebung: ${env.name}`;
-                
-                // Materials with WLO recommendations
-                const materials = role.learning_environment.selected_materials
-                  ?.map(id => env.materials.find(m => m.id === id))
-                  .filter(Boolean);
-                if (materials?.length) {
-                  text += `\nMaterialien: ${materials.map(m => m?.name).join(', ')}`;
-                  const wloMaterials = materials.filter(m => m?.wlo_metadata);
-                  if (wloMaterials.length) {
-                    text += '\nWLO empfiehlt:';
-                    wloMaterials.forEach(m => {
-                      if (m?.wlo_metadata) {
-                        text += `\n- ${m.wlo_metadata.title}`;
-                        if (m.wlo_metadata.wwwUrl) {
-                          text += ` (${m.wlo_metadata.wwwUrl})`;
-                        }
-                      }
-                    });
-                  }
-                }
-
-                // Tools with WLO recommendations
-                const tools = role.learning_environment.selected_tools
-                  ?.map(id => env.tools.find(t => t.id === id))
-                  .filter(Boolean);
-                if (tools?.length) {
-                  text += `\nWerkzeuge: ${tools.map(t => t?.name).join(', ')}`;
-                  const wloTools = tools.filter(t => t?.wlo_metadata);
-                  if (wloTools.length) {
-                    text += '\nWLO empfiehlt:';
-                    wloTools.forEach(t => {
-                      if (t?.wlo_metadata) {
-                        text += `\n- ${t.wlo_metadata.title}`;
-                        if (t.wlo_metadata.wwwUrl) {
-                          text += ` (${t.wlo_metadata.wwwUrl})`;
-                        }
-                      }
-                    });
-                  }
-                }
-
-                // Services with WLO recommendations
-                const services = role.learning_environment.selected_services
-                  ?.map(id => env.services.find(s => s.id === id))
-                  .filter(Boolean);
-                if (services?.length) {
-                  text += `\nDienste: ${services.map(s => s?.name).join(', ')}`;
-                  const wloServices = services.filter(s => s?.wlo_metadata);
-                  if (wloServices.length) {
-                    text += '\nWLO empfiehlt:';
-                    wloServices.forEach(s => {
-                      if (s?.wlo_metadata) {
-                        text += `\n- ${s.wlo_metadata.title}`;
-                        if (s.wlo_metadata.wwwUrl) {
-                          text += ` (${s.wlo_metadata.wwwUrl})`;
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            }
-            return text;
-          }).join('\n\n');
-          activityData.push(roleText || '');
-        });
-
-        tableData.push(activityData);
-      });
-    });
-  });
-
-  // Generate table
-  autoTable(pdf, {
-    head: [
-      [
-        { content: 'Aktivitätsdetails', styles: { fillColor: [66, 139, 202], textColor: 255 } },
-        ...state.actors.map(actor => ({
-          content: actor.name || 'Unbenannter Akteur',
-          styles: { fillColor: [66, 139, 202], textColor: 255 }
-        }))
-      ]
-    ],
-    body: tableData,
-    startY: yPos,
-    styles: {
-      fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      valign: 'top'
-    },
-    columnStyles: {
-      0: { cellWidth: 40 },
-      ...Object.fromEntries(
-        state.actors.map((_, index) => [index + 1, { cellWidth: (170 - 40) / state.actors.length }])
-      )
-    },
-    margin: { left: 20, right: 20 }
   });
 
   // Save the PDF

@@ -52,36 +52,36 @@ export function PatternElements() {
     setSources
   } = useTemplateStore();
 
-  const handleLearningGoalsChange = (value: string) => {
+  const handleLearningGoalsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setProblem({
       ...problem,
-      learning_goals: value.split('\n').map(g => g.trim()).filter(g => g)
+      learning_goals: e.target.value.split('\n')
     });
   };
 
-  const handleKeywordsChange = (value: string) => {
+  const handleKeywordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProblem({
       ...problem,
-      didactic_keywords: value.split(',').map(k => k.trim()).filter(k => k)
+      didactic_keywords: e.target.value.split(',').map(k => k.trim())
     });
   };
 
-  const handleAdvantagesChange = (value: string) => {
+  const handleAdvantagesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setConsequences({
       ...consequences,
-      advantages: value.split('\n').map(a => a.trim()).filter(a => a)
+      advantages: e.target.value.split('\n')
     });
   };
 
-  const handleDisadvantagesChange = (value: string) => {
+  const handleDisadvantagesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setConsequences({
       ...consequences,
-      disadvantages: value.split('\n').map(d => d.trim()).filter(d => d)
+      disadvantages: e.target.value.split('\n')
     });
   };
 
-  const handleRelatedPatternsChange = (value: string) => {
-    setRelatedPatterns(value.split('\n').map(p => p.trim()).filter(p => p));
+  const handleRelatedPatternsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setRelatedPatterns(e.target.value.split('\n'));
   };
 
   const handleAddImplementationNote = () => {
@@ -189,7 +189,7 @@ export function PatternElements() {
             <label className="block text-sm font-medium text-gray-700">Lernziele (eines pro Zeile)</label>
             <textarea
               value={problem.learning_goals.join('\n')}
-              onChange={(e) => handleLearningGoalsChange(e.target.value)}
+              onChange={handleLearningGoalsChange}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
@@ -200,7 +200,7 @@ export function PatternElements() {
             <input
               type="text"
               value={problem.didactic_keywords.join(', ')}
-              onChange={(e) => handleKeywordsChange(e.target.value)}
+              onChange={handleKeywordsChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
@@ -348,7 +348,7 @@ export function PatternElements() {
             <label className="block text-sm font-medium text-gray-700">Vorteile (einer pro Zeile)</label>
             <textarea
               value={consequences.advantages.join('\n')}
-              onChange={(e) => handleAdvantagesChange(e.target.value)}
+              onChange={handleAdvantagesChange}
               rows={4}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="z.B. Fördert selbstständiges Lernen"
@@ -359,7 +359,7 @@ export function PatternElements() {
             <label className="block text-sm font-medium text-gray-700">Nachteile (einer pro Zeile)</label>
             <textarea
               value={consequences.disadvantages.join('\n')}
-              onChange={(e) => handleDisadvantagesChange(e.target.value)}
+              onChange={handleDisadvantagesChange}
               rows={4}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="z.B. Höherer Zeitaufwand in der Vorbereitung"
@@ -407,7 +407,7 @@ export function PatternElements() {
           <label className="block text-sm font-medium text-gray-700">Verwandte Muster (eines pro Zeile)</label>
           <textarea
             value={related_patterns.join('\n')}
-            onChange={(e) => handleRelatedPatternsChange(e.target.value)}
+            onChange={handleRelatedPatternsChange}
             rows={4}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             placeholder="z.B. Kooperatives Lernen"

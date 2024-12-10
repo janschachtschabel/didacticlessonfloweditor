@@ -26,8 +26,9 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
     }
   };
 
-  const handleArrayInput = (value: string, field: string, parentField?: string) => {
-    const array = value.split(',').map(item => item.trim()).filter(Boolean);
+  const handleArrayInput = (e: React.ChangeEvent<HTMLInputElement>, field: string, parentField?: string) => {
+    const array = e.target.value.split(',').map(item => item.trim());
+    
     if (parentField) {
       onUpdate({
         [parentField]: {
@@ -246,53 +247,48 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         <h3 className="text-lg font-medium mb-4">Kompetenzen</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Fachkompetenzen</label>
+            <label className="block text-sm font-medium mb-1">Fachkompetenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.competencies.subject_competencies.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'subject_competencies', 'competencies')}
+              onChange={(e) => handleArrayInput(e, 'subject_competencies', 'competencies')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Kognitive Kompetenzen</label>
+            <label className="block text-sm font-medium mb-1">Kognitive Kompetenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.competencies.cognitive_competencies.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'cognitive_competencies', 'competencies')}
+              onChange={(e) => handleArrayInput(e, 'cognitive_competencies', 'competencies')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Methodische Kompetenzen</label>
+            <label className="block text-sm font-medium mb-1">Methodische Kompetenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.competencies.methodical_competencies.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'methodical_competencies', 'competencies')}
+              onChange={(e) => handleArrayInput(e, 'methodical_competencies', 'competencies')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Affektive Kompetenzen</label>
+            <label className="block text-sm font-medium mb-1">Affektive Kompetenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.competencies.affective_competencies.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'affective_competencies', 'competencies')}
+              onChange={(e) => handleArrayInput(e, 'affective_competencies', 'competencies')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Digitale Kompetenzen</label>
+            <label className="block text-sm font-medium mb-1">Digitale Kompetenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.competencies.digital_competencies.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'digital_competencies', 'competencies')}
+              onChange={(e) => handleArrayInput(e, 'digital_competencies', 'competencies')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           
@@ -355,33 +351,30 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         <h3 className="text-lg font-medium mb-4">Lernanforderungen</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Lernpräferenzen</label>
+            <label className="block text-sm font-medium mb-1">Lernpräferenzen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.learning_requirements.learning_preferences.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'learning_preferences', 'learning_requirements')}
+              onChange={(e) => handleArrayInput(e, 'learning_preferences', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Besondere Bedürfnisse</label>
+            <label className="block text-sm font-medium mb-1">Besondere Bedürfnisse (kommagetrennt)</label>
             <input
               type="text"
               value={actor.learning_requirements.special_needs.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'special_needs', 'learning_requirements')}
+              onChange={(e) => handleArrayInput(e, 'special_needs', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Technische Anforderungen</label>
+            <label className="block text-sm font-medium mb-1">Technische Anforderungen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.learning_requirements.technical_requirements.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'technical_requirements', 'learning_requirements')}
+              onChange={(e) => handleArrayInput(e, 'technical_requirements', 'learning_requirements')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
         </div>
@@ -392,23 +385,21 @@ export function ActorForm({ actor, onUpdate, onCancel, onSave }: ActorFormProps)
         <h3 className="text-lg font-medium mb-4">Interessen und Ziele</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Interessen</label>
+            <label className="block text-sm font-medium mb-1">Interessen (kommagetrennt)</label>
             <input
               type="text"
               value={actor.interests_and_goals.interests.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'interests', 'interests_and_goals')}
+              onChange={(e) => handleArrayInput(e, 'interests', 'interests_and_goals')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Ziele</label>
+            <label className="block text-sm font-medium mb-1">Ziele (kommagetrennt)</label>
             <input
               type="text"
               value={actor.interests_and_goals.goals.join(', ')}
-              onChange={(e) => handleArrayInput(e.target.value, 'goals', 'interests_and_goals')}
+              onChange={(e) => handleArrayInput(e, 'goals', 'interests_and_goals')}
               className="w-full p-2 border rounded"
-              placeholder="Kommagetrennte Liste"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
