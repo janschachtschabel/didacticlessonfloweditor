@@ -236,4 +236,4 @@ Return validation results as a JSON object with:
   "isValid": boolean,
   "issues": string[],
   "fixes": string[]
-}`;`;
+}`;
