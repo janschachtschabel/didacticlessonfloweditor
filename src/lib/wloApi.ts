@@ -69,6 +69,18 @@ export async function searchWLO({
     const url = `/api/edu-sharing/rest/search/v1/queries/-home-/mds_oeh/ngsearch?${searchParams}`;
     console.log('Making request to:', url);
 
+    // Helper function to fix preview URLs
+    const fixPreviewUrl = (node: any) => {
+      if (node.preview?.url) {
+        // Check if URL already starts with http(s)
+        if (!node.preview.url.startsWith('http')) {
+          // Add base URL only if needed
+          node.preview.url = `https://redaktion.openeduhub.net${node.preview.url}`;
+        }
+      }
+      return node;
+    };
+
     const response = await axios.post(
       url,
       { criteria },
@@ -81,6 +93,11 @@ export async function searchWLO({
         signal
       }
     );
+
+    // Fix preview URLs in response
+    if (response.data.nodes) {
+      response.data.nodes = response.data.nodes.map(fixPreviewUrl);
+    }
 
     console.log('Received response:', {
       status: response.status,
