@@ -124,7 +124,7 @@ export function ShoppingCart() {
           subject: node.properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
           educationalContext: node.properties['ccm:educationalcontext_DISPLAYNAME'] || [],
           wwwUrl: node.properties['ccm:wwwurl']?.[0] || null,
-          previewUrl: node.preview?.url || null,
+          previewUrl: node.preview?.url ? `https://redaktion.openeduhub.net/edu-sharing/preview?nodeId=${node.ref.id}&storeProtocol=workspace&storeId=SpacesStore` : null,
           resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
@@ -181,7 +181,7 @@ export function ShoppingCart() {
           subject: node.properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
           educationalContext: node.properties['ccm:educationalcontext_DISPLAYNAME'] || [],
           wwwUrl: node.properties['ccm:wwwurl']?.[0] || null,
-          previewUrl: node.preview?.url || null,
+          previewUrl: node.preview?.url ? `https://redaktion.openeduhub.net/edu-sharing/preview?nodeId=${node.ref.id}&storeProtocol=workspace&storeId=SpacesStore` : null,
           resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
