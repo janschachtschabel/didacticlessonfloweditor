@@ -152,7 +152,7 @@ export function ShoppingCart() {
         values: searchCriteria.map(c => c.value),
         maxItems: 10,
         skipCount: newPage * ITEMS_PER_PAGE,
-        endpoint: 'https://redaktion.openeduhub.net/edu-sharing/rest',
+        endpoint: '/api/edu-sharing/rest',
         combineMode
       });
       
