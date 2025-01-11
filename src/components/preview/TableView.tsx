@@ -12,7 +12,18 @@ export function TableView() {
   const [selectedResources, setSelectedResources] = useState<any[]>([]);
 
   const handleResourceClick = useCallback((resources: any[]) => {
-    setSelectedResources(resources);
+    setSelectedResources(resources.map(resource => ({
+      ...resource,
+      wlo_metadata: Array.isArray(resource.wlo_metadata) ? 
+        resource.wlo_metadata.map((metadata: any) => ({
+          ...metadata,
+          previewUrl: metadata.previewUrl
+        })) :
+        {
+          ...resource.wlo_metadata,
+          previewUrl: resource.wlo_metadata.previewUrl
+        }
+    })));
   }, []);
 
   return (
