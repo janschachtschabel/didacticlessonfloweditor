@@ -99,7 +99,7 @@ export async function searchWLO({
         config: {
           url: error.config?.url,
           method: error.config?.method,
-          previewUrl: node.preview?.url || null,
+          previewUrl: node.ref?.id ? `https://redaktion.openeduhub.net/edu-sharing/preview?nodeId=${node.ref.id}&storeProtocol=workspace&storeId=SpacesStore` : null,
           resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
                        node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
