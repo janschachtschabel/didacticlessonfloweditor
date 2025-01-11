@@ -11,14 +11,14 @@ export function Start() {
         </div>
 
         <p className="text-lg text-blue-800">
-          Erstellen Sie professionelle didaktische Templates mit KI-Unterstützung und direkter Integration von Bildungsressourcen aus der WLO-Datenbank.
+          Erstellen Sie professionelle didaktische Templates mit KI-Unterstützung und direkter Integration von Bildungsressourcen aus der WLO-Datenbank. Alle Inhalte werden automatisch mit der korrekten Basis-URL verknüpft.
         </p>
       </div>
 
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-purple-900">Was ist der KI Assistent für Unterrichtsabläufe?</h2>
         <p className="text-purple-800">
-          Ein intelligentes Werkzeug zur Erstellung strukturierter Unterrichtsabläufe. Kombinieren Sie didaktische Entwurfsmuster mit passenden Bildungsressourcen und erstellen Sie wiederverwendbare Templates für Ihren Unterricht. Laden Sie praxiserprobte Vorlagen aus der Community, um diese für Ihre Zwecke anzupassen.
+          Ein intelligentes Werkzeug zur Erstellung strukturierter Unterrichtsabläufe. Kombinieren Sie didaktische Entwurfsmuster mit passenden Bildungsressourcen aus der WLO-Datenbank und erstellen Sie wiederverwendbare Templates für Ihren Unterricht. Laden Sie praxiserprobte Vorlagen aus der Community und passen Sie diese für Ihre Zwecke an.
         </p>
       </div>
 
@@ -27,19 +27,23 @@ export function Start() {
         <ul className="space-y-2 text-green-800">
           <li className="flex items-center">
             <span className="text-emerald-500 mr-2">✓</span>
-            Strukturierte Unterrichtsplanung
+            Maschinenlesbare Unterrichtsabläufe für einfachen Austausch
           </li>
           <li className="flex items-center">
             <span className="text-emerald-500 mr-2">✓</span>
-            KI-gestützte Optimierung
+            Professionalisierung durch Community-Austausch
           </li>
           <li className="flex items-center">
             <span className="text-emerald-500 mr-2">✓</span>
-            Integration von WLO-Ressourcen
+            Stärkung der Lehrenden-Community
           </li>
           <li className="flex items-center">
             <span className="text-emerald-500 mr-2">✓</span>
-            Flexible Anpassungsmöglichkeiten
+            Zeitersparnis in der Unterrichtsvorbereitung
+          </li>
+          <li className="flex items-center">
+            <span className="text-emerald-500 mr-2">✓</span>
+            KI-gestützte Optimierung und WLO-Integration
           </li>
         </ul>
       </div>
@@ -56,13 +60,13 @@ export function Start() {
           <div className="space-y-2">
             <div className="text-lg font-medium text-amber-700">2. Struktur aufbauen</div>
             <p className="text-amber-800">
-              Legen Sie Akteure, Lernumgebungen und Ressourcen fest. Gestalten Sie den Unterrichtsablauf.
+              Legen Sie Akteure und Lernumgebungen fest. Suchen Sie passende WLO-Ressourcen im Warenkorb und gestalten Sie den Unterrichtsablauf.
             </p>
           </div>
           <div className="space-y-2">
             <div className="text-lg font-medium text-amber-700">3. Optimieren & Erweitern</div>
             <p className="text-amber-800">
-              Nutzen Sie die KI-Funktionen und WLO-Integration für optimale Ergebnisse.
+              Nutzen Sie die KI-Funktionen für die Optimierung und die WLO-Integration für passende Bildungsressourcen.
             </p>
           </div>
         </div>
@@ -77,14 +81,15 @@ export function Start() {
               <li>Allgemeines - Grundlegende Informationen</li>
               <li>Didaktik - Didaktische Struktur</li>
               <li>Akteure - Beteiligte Personen/Gruppen</li>
-              <li>Lernumgebungen - Ressourcen & Werkzeuge</li>
+              <li>Lernumgebungen - Manuelle Ressourcen & Werkzeuge</li>
+              <li>Warenkorb - WLO-Bildungsressourcen suchen</li>
               <li>Unterrichtsablauf - Detaillierte Planung</li>
             </ul>
           </div>
           <div>
             <h3 className="text-lg font-medium mb-2 text-cyan-800">Zusätzliche Funktionen:</h3>
             <ul className="space-y-2 text-cyan-700 list-disc list-inside">
-              <li>Vorschau - Visualisierung des Templates</li>
+              <li>Vorschau - Visualisierung mit WLO-Vorschaubildern</li>
               <li>KI Ablauf - Automatische Optimierung</li>
               <li>KI Filter - Intelligente Ressourcensuche</li>
               <li>WLO Inhalte - Integration von Bildungsressourcen</li>
