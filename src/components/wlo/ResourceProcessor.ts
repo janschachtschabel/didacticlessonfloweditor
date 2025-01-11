@@ -69,7 +69,19 @@ async function processResourceItem(
       .join(',');
 
     // Extrahiere die Metadaten für alle gefundenen Nodes
-    const wloMetadataArray = searchResults.nodes.map(node => extractWLOMetadata(node));
+    const wloMetadataArray = searchResults.nodes.map(node => ({
+      title: node.properties['cclom:title']?.[0] || '',
+      keywords: node.properties['cclom:general_keyword'] || [],
+      description: node.properties['cclom:general_description']?.[0] || '',
+      subject: node.properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
+      educationalContext: node.properties['ccm:educationalcontext_DISPLAYNAME'] || [],
+      wwwUrl: node.properties['ccm:wwwurl']?.[0] || null,
+      previewUrl: node.ref?.id ? `https://redaktion.openeduhub.net/edu-sharing/preview?nodeId=${node.ref.id}&storeProtocol=workspace&storeId=SpacesStore` : null,
+      resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
+                   node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
+                   node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
+                   'Lernressource'
+    }));
 
     addStatus(`✅ ${searchResults.nodes.length} WLO-Ergebnisse gefunden:`);
     searchResults.nodes.forEach((node, index) => {
