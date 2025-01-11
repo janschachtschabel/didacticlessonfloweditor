@@ -29,8 +29,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
           <div className="h-full flex flex-col">
             {metadata.previewUrl && (
               <div className="h-40 mb-2 relative">
-                <img 
-                  src={metadata.previewUrl} 
+                <img
+                  src={metadata.previewUrl.startsWith('http') ? metadata.previewUrl : `https://redaktion.openeduhub.net${metadata.previewUrl}`}
                   alt={metadata.title || resource.name}
                   className="absolute inset-0 w-full h-full object-cover rounded"
                   loading="lazy"
