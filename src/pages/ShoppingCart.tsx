@@ -6,11 +6,6 @@ import { searchWLO } from '../lib/wloApi';
 import { BILDUNGSSTUFE_MAPPING, FACH_MAPPING, INHALTSTYP_MAPPING } from '../lib/mappings';
 import { ShoppingCartIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const API_ENDPOINTS = {
-  PRODUCTION: 'https://redaktion.openeduhub.net/edu-sharing/rest',
-  STAGING: 'https://repository.staging.openeduhub.net/edu-sharing/rest'
-};
-
 export function ShoppingCart() {
   const state = useTemplateStore();
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,62 +21,102 @@ export function ShoppingCart() {
   const [showNewEnvironmentDialog, setShowNewEnvironmentDialog] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState('');
   const [newEnvironmentDescription, setNewEnvironmentDescription] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
+  const ITEMS_PER_PAGE = 10;
+  const [searchCriteria, setSearchCriteria] = useState<Array<{property: string, value: string}>>([]);
+  const [maxItems, setMaxItems] = useState(5);
+  const [combineMode, setCombineMode] = useState<'OR' | 'AND'>('AND');
 
   const handleSearch = async () => {
     setLoading(true);
     setError(null);
     
+    console.log('Starting search with criteria:', {
+      searchTerm,
+      educationalContext,
+      discipline,
+      contentType
+    });
     try {
-      const searchCriteria = [];
+      const criteria = [];
 
       if (searchTerm) {
-        searchCriteria.push({
+        criteria.push({
           property: 'cclom:title',
           value: searchTerm
         });
       }
 
       if (educationalContext) {
-        searchCriteria.push({
+        criteria.push({
           property: 'ccm:educationalcontext',
           value: educationalContext
         });
       }
 
       if (discipline) {
-        searchCriteria.push({
+        criteria.push({
           property: 'ccm:taxonid',
           value: discipline
         });
       }
 
       if (contentType) {
-        searchCriteria.push({
+        criteria.push({
           property: 'ccm:oeh_lrt_aggregated',
           value: contentType
         });
       }
 
-      if (searchCriteria.length === 0) {
+      if (criteria.length === 0) {
         setError('Bitte geben Sie mindestens ein Suchkriterium ein');
         setLoading(false);
         return;
       }
 
-      const results = await searchWLO({
-        properties: searchCriteria.map(c => c.property),
-        values: searchCriteria.map(c => c.value),
-        maxItems: 10,
-        endpoint: API_ENDPOINTS.PRODUCTION,
-        combineMode: 'AND'
-      });
+      // Store search criteria for pagination
+      setSearchCriteria(criteria);
 
-      if (!results.nodes) {
+      await performSearch(criteria);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const performSearch = async (criteria: Array<{property: string, value: string}>) => {
+    try {
+      const searchResponse = await searchWLO({
+        properties: criteria.map(c => c.property),
+        values: criteria.map(c => c.value),
+        maxItems: 10,
+        skipCount: currentPage * ITEMS_PER_PAGE,
+        endpoint: 'https://redaktion.openeduhub.net/edu-sharing/rest',
+        combineMode
+      });
+      
+      if (!searchResponse.nodes) {
         setSearchResults([]);
+        setTotalResults(0);
+        setError('Keine Ergebnisse gefunden');
+        setLoading(false);
         return;
       }
 
-      const processedResults = results.nodes.map((node: any) => ({
+      console.log('Search response:', {
+        total: searchResponse.total,
+        nodes: searchResponse.nodes.length
+      });
+
+      // Update total results count from pagination info
+      const total = searchResponse.pagination?.total || searchResponse.total || 0;
+      setTotalResults(total);
+      console.log('Total results:', total);
+
+      setSearchResults(searchResponse.nodes.map((node: any) => ({
         name: node.properties['cclom:title']?.[0] || 'Ohne Titel',
         wlo_metadata: {
           title: node.properties['cclom:title']?.[0] || 'Ohne Titel',
@@ -89,13 +124,75 @@ export function ShoppingCart() {
           subject: node.properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
           educationalContext: node.properties['ccm:educationalcontext_DISPLAYNAME'] || [],
           wwwUrl: node.properties['ccm:wwwurl']?.[0] || null,
-          previewUrl: node.preview?.url || null
+          previewUrl: node.preview?.url || null,
+          resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
+                       'Lernressource'
         }
-      }));
-
-      setSearchResults(processedResults);
+      })));
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten');
+      const errorMessage = error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten';
+      setError(errorMessage);
+      setSearchResults([]);
+      setTotalResults(0);
+    }
+  };
+
+  const handlePageChange = async (newPage: number) => {
+    if (newPage < 0 || newPage >= totalPages) return;
+    
+    console.log('Changing to page', newPage, 'with skipCount:', newPage * ITEMS_PER_PAGE);
+    setLoading(true);
+    setCurrentPage(newPage);
+    
+    try {
+      const searchResponse = await searchWLO({
+        properties: searchCriteria.map(c => c.property),
+        values: searchCriteria.map(c => c.value),
+        maxItems: 10,
+        skipCount: newPage * ITEMS_PER_PAGE,
+        endpoint: 'https://redaktion.openeduhub.net/edu-sharing/rest',
+        combineMode
+      });
+      
+      console.log('Search response:', {
+        total: searchResponse.total,
+        nodes: searchResponse.nodes?.length || 0,
+        skipCount: newPage * ITEMS_PER_PAGE
+      });
+
+      if (!searchResponse.nodes) {
+        setSearchResults([]);
+        setTotalResults(0);
+        setError('Keine Ergebnisse gefunden');
+        return;
+      }
+
+      // Update total results count from pagination info
+      const total = searchResponse.pagination?.total || searchResponse.total || 0;
+      setTotalResults(total);
+
+      setSearchResults(searchResponse.nodes.map((node: any) => ({
+        name: node.properties['cclom:title']?.[0] || 'Ohne Titel',
+        wlo_metadata: {
+          title: node.properties['cclom:title']?.[0] || 'Ohne Titel',
+          description: node.properties['cclom:general_description']?.[0] || '',
+          subject: node.properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
+          educationalContext: node.properties['ccm:educationalcontext_DISPLAYNAME'] || [],
+          wwwUrl: node.properties['ccm:wwwurl']?.[0] || null,
+          previewUrl: node.preview?.url || null,
+          resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
+                       'Lernressource'
+        }
+      })));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten';
+      setError(errorMessage);
+      setSearchResults([]);
+      setTotalResults(0);
     } finally {
       setLoading(false);
     }
@@ -179,6 +276,9 @@ export function ShoppingCart() {
     setCartItems([]);
     setError('Ressourcen wurden erfolgreich zur Lernumgebung hinzugefügt');
   };
+
+
+  const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-6">
@@ -275,6 +375,31 @@ export function ShoppingCart() {
             </div>
             {searchResults.length === 0 && !loading && (
               <p className="text-gray-500 text-center">Keine Suchergebnisse gefunden</p>
+            )}
+
+            {/* Pagination */}
+            {totalResults > ITEMS_PER_PAGE && (
+              <div className="mt-6">
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 0}
+                    className="px-3 py-2 border rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    ← Zurück
+                  </button>
+                  <span className="text-sm">
+                    Seite {currentPage + 1} von {totalPages}
+                  </span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages - 1}
+                    className="px-3 py-2 border rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Weiter →
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

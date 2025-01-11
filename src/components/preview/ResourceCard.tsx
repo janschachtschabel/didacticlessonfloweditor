@@ -18,10 +18,14 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   return (
     <>
       {metadataArray.map((metadata, index) => (
-        <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow h-full">
+        <div 
+          key={index} 
+          className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+          style={{ height: '356px' }}
+        >
           <div className="flex flex-col h-full">
             {metadata.previewUrl && (
-              <div className="mb-3 aspect-video relative">
+              <div className="h-40 mb-2 relative">
                 <img 
                   src={metadata.previewUrl} 
                   alt={metadata.title || resource.name}
@@ -52,7 +56,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
                 </p>
               )}
               
-              <div className="flex flex-wrap gap-1 mt-auto">
+              <div className="flex flex-wrap gap-1 mt-auto mb-0">
                 {metadata.subject && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {metadata.subject}
@@ -66,6 +70,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
                     {context}
                   </span>
                 ))}
+                {metadata.resourceType && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    {metadata.resourceType}
+                  </span>
+                )}
               </div>
             </div>
           </div>

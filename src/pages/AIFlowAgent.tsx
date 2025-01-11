@@ -12,11 +12,6 @@ const AI_MODELS = [
   { id: 'gpt-4o', name: 'GPT-4O' }
 ];
 
-const API_ENDPOINTS = {
-  PRODUCTION: 'https://redaktion.openeduhub.net/edu-sharing/rest',
-  STAGING: 'https://repository.staging.openeduhub.net/edu-sharing/rest'
-};
-
 const METADATA_OPTIONS = [
   { id: 'cclom:title', label: 'Titel' },
   { id: 'ccm:oeh_lrt_aggregated', label: 'Inhaltstyp' },
@@ -24,7 +19,7 @@ const METADATA_OPTIONS = [
   { id: 'ccm:educationalcontext', label: 'Bildungskontext' }
 ];
 
-const AIFlowAgent: React.FC = () => {
+export default function AIFlowAgent() {
   const state = useTemplateStore();
   const [apiKey, setApiKey] = useState('');
   const [model, setModel] = useState('gpt-4o-mini');
@@ -48,7 +43,6 @@ const AIFlowAgent: React.FC = () => {
   const [selectedMetadata, setSelectedMetadata] = useState(['cclom:title', 'ccm:oeh_lrt_aggregated', 'ccm:taxonid']);
 
   // WLO options
-  const [endpoint, setEndpoint] = useState<keyof typeof API_ENDPOINTS>('PRODUCTION');
   const [maxItems, setMaxItems] = useState(5);
   const [combineMode, setCombineMode] = useState<'OR' | 'AND'>('AND');
 
@@ -292,7 +286,6 @@ const AIFlowAgent: React.FC = () => {
               env.name,
               addStatus,
               {
-                endpoint: API_ENDPOINTS[endpoint],
                 maxItems,
                 combineMode,
                 signal: abortControllerRef.current.signal
@@ -310,7 +303,6 @@ const AIFlowAgent: React.FC = () => {
               env.name,
               addStatus,
               {
-                endpoint: API_ENDPOINTS[endpoint],
                 maxItems,
                 combineMode,
                 signal: abortControllerRef.current.signal
@@ -328,7 +320,6 @@ const AIFlowAgent: React.FC = () => {
               env.name,
               addStatus,
               {
-                endpoint: API_ENDPOINTS[endpoint],
                 maxItems,
                 combineMode,
                 signal: abortControllerRef.current.signal
@@ -505,18 +496,6 @@ const AIFlowAgent: React.FC = () => {
               {useWLOInhalte && (
                 <div className="pl-8 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">API-Endpunkt</label>
-                    <select
-                      value={endpoint}
-                      onChange={(e) => setEndpoint(e.target.value as keyof typeof API_ENDPOINTS)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                      <option value="PRODUCTION">Produktion</option>
-                      <option value="STAGING">Staging</option>
-                    </select>
-                  </div>
-
-                  <div>
                     <label className="block text-sm font-medium text-gray-700">Maximale Ergebnisse</label>
                     <input
                       type="number"
@@ -600,6 +579,4 @@ const AIFlowAgent: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default AIFlowAgent;
+}

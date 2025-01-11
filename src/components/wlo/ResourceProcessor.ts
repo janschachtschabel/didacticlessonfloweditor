@@ -17,7 +17,11 @@ function extractWLOMetadata(node: any): WLOMetadata {
     subject: properties['ccm:taxonid_DISPLAYNAME']?.[0] || '',
     educationalContext: properties['ccm:educationalcontext_DISPLAYNAME'] || [],
     wwwUrl: properties['ccm:wwwurl']?.[0] || null,
-    previewUrl: node.preview?.url || null
+    previewUrl: node.preview?.url || null,
+    resourceType: properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
+                 properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
+                 properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
+                 'Lernressource'
   };
 }
 

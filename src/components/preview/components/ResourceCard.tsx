@@ -24,7 +24,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         <div 
           key={index} 
           className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
-          style={{ height: '336px' }}
+          style={{ height: '356px' }}
         >
           <div className="h-full flex flex-col">
             {metadata.previewUrl && (
@@ -74,6 +74,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
                     {context}
                   </span>
                 ))}
+                {metadata.resourceType && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    {metadata.resourceType}
+                  </span>
+                )}
               </div>
             </div>
           </div>

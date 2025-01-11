@@ -10,6 +10,8 @@ Ein webbasiertes Tool zur Erstellung und Optimierung von didaktischen Templates 
 - Integration mit der Wirlernenonline.de (WLO) Plattform
 - Visualisierung von Lernsequenzen als Graph und Tabelle
 - PDF-Export von Templates
+- Warenkorb-System für WLO-Ressourcen
+- Community-Templates zum Laden und Anpassen
 
 ## Voraussetzungen
 
@@ -26,24 +28,12 @@ npm install
 
 ## Entwicklung starten
 
-1. Proxy-Server für WLO-Zugriff starten (in einem separaten Terminal):
-```bash
-npm run proxy
-```
-
-2. Entwicklungsserver starten (in einem anderen Terminal):
+Entwicklungsserver starten:
 ```bash
 npm run dev
 ```
 
 Die Anwendung ist dann unter `http://localhost:5173` verfügbar.
-
-## Proxy Server
-
-Der Proxy Server ist erforderlich für den Zugriff auf die WLO-API und läuft standardmäßig auf Port 3001. Er bietet:
-
-- `/proxy` - Hauptendpunkt für WLO-API-Anfragen
-- `/health` - Gesundheitscheck des Proxy-Servers
 
 ## Projektstruktur
 
@@ -56,18 +46,11 @@ src/
   │   └── wlo/          # Komponenten für WLO-Integration
   ├── lib/              # Hilfsfunktionen und Utilities
   ├── pages/            # Hauptseiten der Anwendung
-  ├── server/           # Proxy-Server für WLO-Zugriff
   └── store/            # Zustand-Management mit Zustand
 
 public/                 # Statische Assets
+  └── community-templates/ # Vordefinierte Templates
 ```
-
-## Wichtige Hinweise
-
-- Der Proxy Server muss laufen, damit WLO-Inhalte abgerufen werden können
-- Alle API-Anfragen werden über den Proxy geleitet, um CORS-Probleme zu vermeiden
-- OpenAI API-Key wird für KI-Funktionen benötigt
-- URLs für WLO-Anfragen werden automatisch bereinigt (Kommas werden entfernt)
 
 ## Workflow
 
@@ -75,11 +58,36 @@ public/                 # Statische Assets
 2. Didaktische Grundlagen - Probleme, Ziele und Lösungsansätze definieren
 3. Akteure - Beteiligte Personen und Gruppen anlegen
 4. Lernumgebungen - Ressourcen, Werkzeuge und Dienste zuordnen
-5. Unterrichtsablauf - Sequenzen, Phasen und Aktivitäten gestalten
-6. KI Ablauf - Template optimieren und WLO-Inhalte integrieren
+5. Warenkorb - WLO-Ressourcen suchen und vormerken
+6. Unterrichtsablauf - Sequenzen, Phasen und Aktivitäten gestalten
+7. KI Ablauf - Template optimieren und WLO-Inhalte integrieren
+8. Vorschau - Ergebnisse visualisieren und exportieren
 
-## Bekannte Einschränkungen
+## Features im Detail
 
-- Der Proxy Server muss manuell gestartet werden
-- Nur GET-Anfragen an die WLO-API werden unterstützt
-- Maximale Timeout-Zeit für WLO-Anfragen: 60 Sekunden
+### KI-Unterstützung
+- Generierung und Optimierung von Unterrichtsabläufen
+- Intelligente Filterkriterien für WLO-Ressourcen
+- Lernen aus Community-Templates
+
+### WLO-Integration
+- Direkte Suche in der WLO-Datenbank
+- Warenkorb-System für Ressourcen
+- Automatische Metadaten-Extraktion
+- Filterung nach Bildungsstufe, Fach und Inhaltstyp
+
+### Visualisierung
+- Interaktiver Ablaufgraph
+- Tabellarische Übersicht
+- WLO-Ressourcen-Vorschau
+- PDF-Export
+
+### Template-Management
+- Speichern/Laden von Templates
+- Community-Templates
+- Beispiel-Templates
+- JSON-Export/Import
+
+## Lizenz
+
+Apache 2.0

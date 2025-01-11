@@ -6,13 +6,8 @@ export interface WLOSearchParams {
   maxItems?: number;
   skipCount?: number;
   propertyFilter?: string;
-  endpoint: string;
   combineMode?: 'OR' | 'AND';
   signal?: AbortSignal;
-}
-
-function getProxyUrl(): string {
-  return 'http://localhost:3001/proxy';
 }
 
 export async function searchWLO({
@@ -21,10 +16,18 @@ export async function searchWLO({
   maxItems = 5,
   skipCount = 0,
   propertyFilter = '-all-',
-  endpoint,
   combineMode = 'AND',
   signal
 }: WLOSearchParams) {
+  console.log('Starting WLO search with params:', {
+    properties,
+    values,
+    maxItems,
+    skipCount,
+    propertyFilter,
+    combineMode
+  });
+
   try {
     // Construct the search criteria array
     const criteria = [];
@@ -54,6 +57,8 @@ export async function searchWLO({
       }
     }
 
+    console.log('Constructed search criteria:', criteria);
+
     const searchParams = new URLSearchParams({
       contentType: 'FILES',
       maxItems: maxItems.toString(),
@@ -61,23 +66,51 @@ export async function searchWLO({
       propertyFilter
     });
 
-    const targetUrl = `${endpoint}/search/v1/queries/-home-/mds_oeh/ngsearch?${searchParams.toString()}`;
-    const proxyUrl = `${getProxyUrl()}?url=${encodeURIComponent(targetUrl)}`;
+    const url = `/api/edu-sharing/rest/search/v1/queries/-home-/mds_oeh/ngsearch?${searchParams}`;
+    console.log('Making request to:', url);
 
-    const response = await axios.post(proxyUrl, 
+    const response = await axios.post(
+      url,
       { criteria },
       {
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'WLO-KI-Editor'
         },
         signal
       }
     );
 
+    console.log('Received response:', {
+      status: response.status,
+      headers: response.headers,
+      data: response.data
+    });
     return response.data;
   } catch (error) {
-    console.error('Error searching WLO:', error);
-    throw error;
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        headers: error.response?.headers,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          previewUrl: node.preview?.url || null,
+          resourceType: node.properties['ccm:oeh_lrt_aggregated_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:resourcetype_DISPLAYNAME']?.[0] || 
+                       node.properties['ccm:oeh_lrt_aggregated']?.[0]?.split('/').pop() || 
+                       'Lernressource'
+        }
+      });
+      // Throw a more descriptive error
+      throw new Error(`WLO API request failed: ${error.message} (${error.response?.status} ${error.response?.statusText})`);
+    } else {
+      console.error('Non-Axios error:', error);
+      throw new Error('WLO API request failed: Unknown error occurred');
+    }
   }
 }
