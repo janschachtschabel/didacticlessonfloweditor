@@ -71,6 +71,14 @@
       "author": "Maximilian Müller", 
       "date": "2024-03-22",
       "file": "Umgang-mit-dem-Mikroskop_Anleitung-fuer-den-Biologieunterricht_5+6Klasse.json"
+    },
+    {
+      "id": "template-10",
+      "name": "Syntaxbasierte Großschreibung",
+      "description": "Die Schülerinnen und Schüler lernen einen neuen Ansatz zur satzinternen Großschreibung kennen.",
+      "author": "Tina Neff",
+      "date": "2024-03-23",
+      "file": "Syntaxbasierte_Großschreibung.json"
     }
   ]
 }
